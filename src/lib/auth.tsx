@@ -3,6 +3,9 @@ import type { Session } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { SUPABASE_KEY, SUPABASE_URL, supabase } from './supabase'
 
+// Address (slug) of the member-login Edge Function as deployed in Supabase.
+const MEMBER_LOGIN_FN = 'super-handler'
+
 type Status = 'loading' | 'signed-out' | 'signed-in'
 interface AuthCtx {
   status: Status
@@ -30,13 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const sendCode = useCallback(async (email: string) => {
     const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 25000)
     try {
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/member-login`, {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/${MEMBER_LOGIN_FN}`, {
         method: 'POST', signal: ctl.signal,
         headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY },
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
       })
       const body = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(body?.error || (res.status === 404 ? 'The sign-in service is not set up yet. Ask the e-board to deploy member-login.' : 'The code could not be sent. Please try again.'))
+      if (!res.ok) throw new Error(body?.error || (res.status === 404 ? 'The sign-in service is not set up yet. Please tell the e-board.' : 'The code could not be sent. Please try again.'))
       return { firstName: String(body.first_name ?? ''), length: Number(body.length ?? 6) }
     } catch (e) {
       if ((e as Error).name === 'AbortError') throw new Error('This is taking too long. Check your connection and try again.')
