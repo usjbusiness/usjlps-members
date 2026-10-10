@@ -48,8 +48,10 @@ export interface LiveNow { live: boolean; title: string | null }
 export const useLiveNow = () => useQuery({
   queryKey: ['live-now'], refetchInterval: 30_000,
   queryFn: async (): Promise<LiveNow> => {
-    const { data, error } = await supabase.from('live_state').select('session_id, presentation_id').eq('id', 1).maybeSingle()
+    const { data, error } = await supabase.from('live_state').select('session_id, presentation_id, updated_at').eq('id', 1).maybeSingle()
     if (error || !data?.session_id) return { live: false, title: null }
+    // A session nobody touched for 3 hours was simply never ended — do not show it as live.
+    if (data.updated_at && Date.now() - new Date(data.updated_at as string).getTime() > 3 * 3600_000) return { live: false, title: null }
     let title: string | null = null
     if (data.presentation_id) {
       const { data: p } = await supabase.from('live_presentations').select('title').eq('id', data.presentation_id).maybeSingle()
