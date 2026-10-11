@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/lib/auth'
 import { rankOf, useLiveNow, useMe } from '@/lib/api'
+import { supabase } from '@/lib/supabase'
 import { Avatar, Icon, Medal } from './ui'
 
 export const MAIN = [
@@ -12,14 +13,27 @@ export const MAIN = [
 ]
 export const MORE = [
   { to: '/events', label: 'Events', icon: 'calendar' },
+  { to: '/notes', label: 'My Notes', icon: 'note' },
   { to: '/rank', label: 'Rank & Stickers', icon: 'medal' },
-  { to: '/apparel', label: 'LPS Apparel', icon: 'shirt' },
+  { to: '/apparel', label: 'LPS Merch', icon: 'shirt' },
   { to: '/propose', label: 'Propose an Event', icon: 'bulb' },
   { to: '/install', label: 'Get the App', icon: 'phone' },
   { to: '/profile', label: 'My Profile', icon: 'user' },
 ]
 
+/** Tells the directory you are online (about once a minute while the portal is open). */
+function useHeartbeat() {
+  useEffect(() => {
+    const beat = () => { if (document.visibilityState === 'visible') void supabase.rpc('member_touch').then(() => undefined, () => undefined) }
+    beat()
+    const t = window.setInterval(beat, 60_000)
+    document.addEventListener('visibilitychange', beat)
+    return () => { window.clearInterval(t); document.removeEventListener('visibilitychange', beat) }
+  }, [])
+}
+
 export function Shell() {
+  useHeartbeat()
   const { signOut } = useAuth()
   const me = useMe().data
   const live = useLiveNow().data
@@ -39,9 +53,9 @@ export function Shell() {
         <nav className="side-nav">
           {MAIN.map((n) => <NavLink key={n.to} to={n.to} end={n.end}><Icon name={n.icon} />{n.label}{n.to === '/watch' && live?.live && <b className="live-dot" title="Live now" />}</NavLink>)}
           <p className="side-sec">Society</p>
-          {MORE.slice(0, 4).map((n) => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          {MORE.slice(0, 5).map((n) => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           <p className="side-sec">You</p>
-          {MORE.slice(4).map((n) => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          {MORE.slice(5).map((n) => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           {groupme && <a href={groupme} target="_blank" rel="noopener noreferrer"><Icon name="chat" />GroupMe Chat<Icon name="ext" size={13} className="ext" /></a>}
         </nav>
         <Link to="/profile" className="side-me">

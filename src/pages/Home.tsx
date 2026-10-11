@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { rankOf, useEvents, useLiveNow, useMe, usePosts, type Me } from '@/lib/api'
+import { isOnline, rankOf, useDirectory, useEvents, useLiveNow, useMe, usePosts, type Me } from '@/lib/api'
 import { fmtDate, fmtTime, fmtWhen, firstName, greeting } from '@/lib/format'
-import { Icon, Medal } from '@/components/ui'
+import { Avatar, Icon, Medal } from '@/components/ui'
 import { Net } from '@/components/Net'
 import { seenPosts } from './News'
 
@@ -39,6 +39,8 @@ export function Home() {
   const upcoming = events.filter((e) => new Date(e.starts_at).getTime() > now - 3 * 3600e3).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 3)
   const seen = seenPosts()
   const groupme = me.settings?.groupme_url
+  const people = useDirectory().data ?? []
+  const online = [...new Map(people.filter((p) => !p.is_me && isOnline(p.last_seen_at)).map((p) => [p.person_key, p])).values()]
 
   return (
     <div className="page home">
@@ -57,6 +59,14 @@ export function Home() {
           <span className="livebar-dot"><b className="live-dot" /></span>
           <span><small>Live now</small><strong>{live.title ?? 'Live session'}</strong></span>
           <span className="btn btn-gold btn-sm">Join<Icon name="arrow" size={15} /></span>
+        </Link>
+      )}
+
+      {online.length > 0 && (
+        <Link to="/people" className="onlinebar">
+          <span className="onlinebar-faces">{online.slice(0, 5).map((p) => <Avatar key={p.person_key} name={p.full_name} path={p.avatar_url} size={30} />)}</span>
+          <span><i className="dot-on" /><b>{online.length} online now</b><small>{online.slice(0, 3).map((p) => firstName(p.full_name)).join(', ')}{online.length > 3 ? ` and ${online.length - 3} more` : ''}</small></span>
+          <Icon name="arrow" size={16} />
         </Link>
       )}
 
@@ -102,6 +112,8 @@ export function Home() {
         <Link to="/watch?tab=library" className="qa"><Icon name="live" size={22} /><strong>The Library</strong><small>Past presentations and simulations</small></Link>
         {groupme ? <a href={groupme} target="_blank" rel="noopener noreferrer" className="qa"><Icon name="chat" size={22} /><strong>GroupMe chat</strong><small>Talk with the whole Society</small></a>
           : <Link to="/people" className="qa"><Icon name="people" size={22} /><strong>Members</strong><small>Advisors, e-board and members</small></Link>}
+        <Link to="/notes" className="qa"><Icon name="note" size={22} /><strong>My notes</strong><small>Private notes from every meeting</small></Link>
+        <Link to="/apparel" className="qa"><Icon name="shirt" size={22} /><strong>LPS merch</strong><small>Pin at Bronze, polo at Silver</small></Link>
         <Link to="/propose" className="qa"><Icon name="bulb" size={22} /><strong>Propose an event</strong><small>Your idea could be next</small></Link>
         <Link to="/install" className="qa"><Icon name="phone" size={22} /><strong>Get the app</strong><small>Add LPS to your home screen</small></Link>
       </section>

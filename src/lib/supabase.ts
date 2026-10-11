@@ -34,6 +34,6 @@ export function friendly(e: unknown): string {
   if (/failed to fetch|network|load failed/i.test(m)) return 'No connection. Check your internet and try again.'
   if (/jwt|token.*expired|not authenticated/i.test(m)) return 'Your session expired. Please sign in again.'
   if (/row-level security|permission denied/i.test(m)) return 'You do not have access to this.'
-  if (/function .* does not exist|could not find the function/i.test(m)) return 'The Member Portal is not fully set up yet. Ask the e-board to run LPS-STEP4.sql.'
+  if (/function .* does not exist|could not find the function|relation .* does not exist|could not find the table/i.test(m)) return 'This part of the portal is not set up yet. Ask the e-board to run the latest SQL update (LPS-STEP5.sql).'
   return m.replace(/^ERROR:\s*/i, '')
 }

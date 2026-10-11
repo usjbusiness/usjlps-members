@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from './supabase'
 
 export interface Sticker { kind: 'meeting' | 'award'; title: string; earned_on: string; value: number; headliner: boolean }
-export interface ApparelRequest { id: string; item: 'cap' | 'polo'; size: string | null; color: string | null; status: string; created_at: string }
+export interface ApparelRequest { id: string; item: 'cap' | 'pin' | 'polo'; size: string | null; color: string | null; status: string; created_at: string }
 export interface Me {
   member: { id: string; full_name: string; email: string; major: string | null; grad_year: number | null; date_joined: string; interests: string[];
     directory_visible: boolean; directory_email: boolean; headline: string | null; linkedin_url: string | null } | null
@@ -11,11 +11,12 @@ export interface Me {
   stickers: Sticker[]
   total: number
   requests: ApparelRequest[]
+  show_activity?: boolean
   settings: { groupme_url?: string | null }
 }
 export interface Post { id: string; title: string; body: string; priority: 'normal' | 'important' | 'urgent'; pinned: boolean; link_url: string | null; link_label: string | null; expires_on: string | null; author_name: string | null; author_position: string | null; created_at: string }
 export interface MemberEvent { id: string; kind: 'meeting' | 'event'; title: string; starts_at: string; ends_at: string | null; location: string | null; description: string | null; headliner: boolean; attended: boolean; status: string }
-export interface Person { person_key: string; kind: 'advisor' | 'eboard' | 'major' | 'member'; full_name: string; title: string | null; role: string | null; major: string | null; grad_year: number | null; email: string | null; avatar_url: string | null; headline: string | null; linkedin_url: string | null; interests: string[]; sort: number; is_me: boolean }
+export interface Person { person_key: string; kind: 'advisor' | 'eboard' | 'major' | 'member'; full_name: string; title: string | null; role: string | null; major: string | null; grad_year: number | null; email: string | null; avatar_url: string | null; headline: string | null; linkedin_url: string | null; interests: string[]; sort: number; is_me: boolean; last_seen_at: string | null }
 export interface Proposal { id: string; title: string; category: string; description: string; timing: string | null; can_help: boolean; status: string; response: string | null; created_at: string }
 
 async function rpc<T>(fn: string, args?: Record<string, unknown>): Promise<T> {
@@ -35,7 +36,7 @@ export const usePosts = () => useQuery({
   },
 })
 export const useEvents = () => useQuery({ queryKey: ['events'], staleTime: 120_000, queryFn: () => rpc<MemberEvent[]>('member_events') })
-export const useDirectory = () => useQuery({ queryKey: ['directory'], staleTime: 300_000, queryFn: () => rpc<Person[]>('member_directory') })
+export const useDirectory = () => useQuery({ queryKey: ['directory'], staleTime: 60_000, refetchInterval: 120_000, queryFn: () => rpc<Person[]>('member_directory') })
 export const useProposals = () => useQuery({
   queryKey: ['proposals'],
   queryFn: async () => {
@@ -75,8 +76,8 @@ export const useAvatar = (path: string | null | undefined) => useQuery({
 // ---- Ranks ---------------------------------------------------------------
 export const RANKS = [
   { key: 'member', name: 'Member', min: 0, perk: 'Every event, the member portal, the library and the GroupMe chat.' },
-  { key: 'bronze', name: 'Bronze', min: 3, perk: 'LPS apparel: a cap or a polo, requested right here in the portal.' },
-  { key: 'silver', name: 'Silver', min: 6, perk: 'A signed LPS certificate for your résumé and LinkedIn.' },
+  { key: 'bronze', name: 'Bronze', min: 3, perk: 'The LPS lapel pin and an LPS sticker, requested right here in the portal.' },
+  { key: 'silver', name: 'Silver', min: 6, perk: 'The LPS polo and a signed LPS certificate for your résumé and LinkedIn.' },
   { key: 'gold', name: 'Gold', min: 10, perk: 'Priority seats and meet-and-greets with headline guests.' },
   { key: 'ivy', name: 'Ivy', min: 15, perk: 'Company trips, an e-board reference and the chance to co-host.' },
 ] as const
@@ -110,3 +111,33 @@ export const CATEGORIES: { value: string; label: string; hint: string }[] = [
 ]
 export const PROPOSAL_STATUS: Record<string, string> = { new: 'Sent', reviewing: 'Under review', planned: 'Planned', declined: 'Not this time' }
 export const APPAREL_STATUS: Record<string, string> = { requested: 'Requested', ordered: 'Ordered', ready: 'Ready for pick-up', picked_up: 'Picked up', declined: 'Declined' }
+
+// ---- My Notes (private to the author) ---------------------------------------
+export interface Note { id: string; title: string; body: string; pinned: boolean; ref_kind: 'meeting' | 'event' | null; ref_id: string | null; ref_title: string | null; ref_date: string | null; created_at: string; updated_at: string }
+export const useNotes = () => useQuery({
+  queryKey: ['notes'], staleTime: 30_000,
+  queryFn: async () => {
+    const { data, error } = await supabase.from('member_notes').select('id, title, body, pinned, ref_kind, ref_id, ref_title, ref_date, created_at, updated_at')
+      .order('pinned', { ascending: false }).order('updated_at', { ascending: false }).limit(500)
+    if (error) throw error
+    return (data ?? []) as Note[]
+  },
+})
+
+// ---- Online / last seen ---------------------------------------------------
+export const ONLINE_MS = 3 * 60_000
+export const isOnline = (ts?: string | null) => !!ts && Date.now() - new Date(ts).getTime() < ONLINE_MS
+/** "Online", "Active 5 min ago", "Active 3 h ago", "Active yesterday", "Active Oct 3". */
+export function seenLabel(ts?: string | null) {
+  if (!ts) return null
+  const diff = Date.now() - new Date(ts).getTime()
+  if (diff < ONLINE_MS) return 'Online'
+  const min = Math.round(diff / 60_000)
+  if (min < 60) return `Active ${min} min ago`
+  const h = Math.round(min / 60)
+  if (h < 24) return `Active ${h} h ago`
+  const d = Math.round(h / 24)
+  if (d === 1) return 'Active yesterday'
+  if (d < 7) return `Active ${d} days ago`
+  return `Active ${new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+}

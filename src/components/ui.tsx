@@ -36,6 +36,9 @@ const P: Record<string, ReactNode> = {
   back: <path d="M19 12H5M11 6l-6 6 6 6" />,
   star: <path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8Z" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
+  note: <><path d="M6 3.5h8.5L19 8v12.5H6Z" /><path d="M14 3.5V8h5M9 12h7M9 15.5h7M9 9h3" /></>,
+  pinned: <><path d="M9 4h6l-1 5 3 3v1.5H7V12l3-3Z" /><path d="M12 13.5V20" /></>,
+  trash: <><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13" /></>,
   board: <><rect x="3.5" y="4.5" width="17" height="12" rx="1.5" /><path d="M8 20.5l4-4 4 4M7.5 9.5h9M7.5 12.5h5" /></>,
 }
 export type IconName = keyof typeof P
@@ -43,11 +46,12 @@ export function Icon({ name, size = 20, ...rest }: { name: string; size?: number
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...rest}>{P[name]}</svg>
 }
 
-export function Avatar({ name, path, size = 44, ring }: { name: string; path?: string | null; size?: number; ring?: string }) {
+export function Avatar({ name, path, size = 44, ring, online }: { name: string; path?: string | null; size?: number; ring?: string; online?: boolean }) {
   const src = useAvatar(path).data
   return (
     <span className="avatar" style={{ width: size, height: size, fontSize: size * 0.36, ...(ring ? { ['--ring' as string]: ring } : {}) }}>
       {src ? <img src={src} alt="" loading="lazy" /> : <span>{initials(name)}</span>}
+      {online && <i className="online-dot" aria-label="Online" />}
     </span>
   )
 }

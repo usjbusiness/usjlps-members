@@ -58,3 +58,35 @@ export function Cap({ color = 'black', className = '' }: { color?: ColorKey; cla
     </svg>
   )
 }
+
+/** The LPS lapel pin: gold-plated rim, ivy enamel field, gold monogram, on its backing card. */
+export function Pin({ className = '' }: { className?: string }) {
+  const hex = (r: number) => Array.from({ length: 6 }, (_, i) => {
+    const a = (Math.PI / 3) * i - Math.PI / 2
+    return `${(200 + r * Math.cos(a)).toFixed(1)},${(170 + r * Math.sin(a)).toFixed(1)}`
+  }).join(' ')
+  return (
+    <svg viewBox="0 0 400 340" className={className} role="img" aria-label="LPS lapel pin">
+      <defs>
+        <linearGradient id="pin-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#F6E3A6" /><stop offset=".35" stopColor="#C9A54C" /><stop offset=".6" stopColor="#8E6B22" /><stop offset=".85" stopColor="#D9BC6E" /><stop offset="1" stopColor="#9C7A2E" /></linearGradient>
+        <radialGradient id="pin-enamel" cx=".4" cy=".32" r=".8"><stop offset="0" stopColor="#2A7458" /><stop offset=".6" stopColor="#1C5743" /><stop offset="1" stopColor="#0C3326" /></radialGradient>
+        <linearGradient id="pin-gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".32" /><stop offset=".45" stopColor="#fff" stopOpacity="0" /></linearGradient>
+        <filter id="pin-d" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="12" floodColor="#000" floodOpacity=".5" /></filter>
+        <clipPath id="pin-clip"><polygon points={hex(100)} /></clipPath>
+      </defs>
+      <rect x="70" y="26" width="260" height="290" rx="18" fill="#F4F1EA" opacity=".08" stroke="rgba(233,212,154,.25)" />
+      <text x="200" y="300" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="17" letterSpacing="4" fill="rgba(233,212,154,.75)">USJ · LPS</text>
+      <g filter="url(#pin-d)">
+        <polygon points={hex(122)} fill="url(#pin-gold)" />
+        <polygon points={hex(112)} fill="none" stroke="#7A5A1A" strokeWidth="2" opacity=".6" />
+        <polygon points={hex(104)} fill="url(#pin-gold)" opacity=".9" />
+        <polygon points={hex(100)} fill="url(#pin-enamel)" />
+      </g>
+      <g clipPath="url(#pin-clip)">
+        <image href="/img/mono-gold.webp" x="158" y="96" width="84" height="148" preserveAspectRatio="xMidYMid meet" />
+        <path d="M80,40 L330,40 L330,150 Q200,120 80,170 Z" fill="url(#pin-gloss)" />
+      </g>
+      <polygon points={hex(121)} fill="none" stroke="#FFF4CF" strokeWidth="1.2" opacity=".55" />
+    </svg>
+  )
+}

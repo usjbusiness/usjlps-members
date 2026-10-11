@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MAJOR_ROLE, ROLE_COLOR, useDirectory, type Person } from '@/lib/api'
+import { MAJOR_ROLE, ROLE_COLOR, isOnline, seenLabel, useDirectory, type Person } from '@/lib/api'
 import { Avatar, Empty, ErrorBox, Icon, PageHead, Spinner } from '@/components/ui'
 
 const GROUPS = [
@@ -11,7 +11,7 @@ const GROUPS = [
 ] as const
 const RANK = { advisor: 0, eboard: 1, major: 2, member: 3 } as const
 
-interface Card { key: string; kind: Person['kind']; name: string; badges: { label: string; color: string; dashed?: boolean }[]; major: string | null; year: number | null; email: string | null; avatar: string | null; headline: string | null; linkedin: string | null; interests: string[]; sort: number; me: boolean }
+interface Card { key: string; kind: Person['kind']; name: string; badges: { label: string; color: string; dashed?: boolean }[]; major: string | null; year: number | null; email: string | null; avatar: string | null; headline: string | null; linkedin: string | null; interests: string[]; sort: number; me: boolean; seen: string | null }
 
 function merge(rows: Person[]): Card[] {
   const map = new Map<string, Card>()
@@ -21,10 +21,11 @@ function merge(rows: Person[]): Card[] {
       : { label: p.title || 'E-Board', color: ROLE_COLOR[p.role ?? ''] ?? '#C9A54C' }
     const c = map.get(p.person_key)
     if (!c) {
-      map.set(p.person_key, { key: p.person_key, kind: p.kind, name: p.full_name, badges: [badge], major: p.major, year: p.grad_year, email: p.email, avatar: p.avatar_url, headline: p.headline, linkedin: p.linkedin_url, interests: p.interests ?? [], sort: p.sort, me: p.is_me })
+      map.set(p.person_key, { key: p.person_key, kind: p.kind, name: p.full_name, badges: [badge], major: p.major, year: p.grad_year, email: p.email, avatar: p.avatar_url, headline: p.headline, linkedin: p.linkedin_url, interests: p.interests ?? [], sort: p.sort, me: p.is_me, seen: p.last_seen_at })
     } else {
       if (RANK[p.kind] < RANK[c.kind]) { c.kind = p.kind; c.sort = p.sort; c.badges.unshift(badge) } else if (p.kind !== 'member') c.badges.push(badge)
       c.email ??= p.email; c.avatar ??= p.avatar_url; c.headline ??= p.headline; c.linkedin ??= p.linkedin_url; c.major ??= p.major; c.year ??= p.grad_year; c.me ||= p.is_me
+      if (p.last_seen_at && (!c.seen || p.last_seen_at > c.seen)) c.seen = p.last_seen_at
       if (!c.interests.length) c.interests = p.interests ?? []
     }
   }
@@ -33,14 +34,17 @@ function merge(rows: Person[]): Card[] {
 }
 
 function PersonCard({ c }: { c: Card }) {
+  const on = !c.me && isOnline(c.seen)
+  const label = c.me ? null : seenLabel(c.seen)
   return (
     <article className={`person kind-${c.kind}${c.me ? ' is-me' : ''}`}>
-      <Avatar name={c.name} path={c.avatar} size={c.kind === 'member' ? 46 : 58} ring={c.badges[0]?.color} />
+      <Avatar name={c.name} path={c.avatar} size={c.kind === 'member' ? 46 : 58} ring={c.badges[0]?.color} online={on} />
       <div className="person-main">
         <strong>{c.name}{c.me && <em className="you">You</em>}</strong>
         <div className="badges">{c.badges.map((b) => <span key={b.label} className={`role${b.dashed ? ' is-dashed' : ''}`} style={{ ['--rc' as string]: b.color }}><i />{b.label}</span>)}</div>
         <small>{[c.major, c.year ? `Class of ${c.year}` : null].filter(Boolean).join(' · ')}</small>
         {c.headline && <p className="person-head">{c.headline}</p>}
+        {label && <p className={`seen${on ? ' is-on' : ''}`}><i />{label}</p>}
       </div>
       <div className="person-links">
         {c.email && <a href={`mailto:${c.email}`} aria-label={`Email ${c.name}`} title={c.email}><Icon name="mail" size={18} /></a>}
@@ -58,7 +62,8 @@ export function People() {
   const cards = useMemo(() => merge(q.data ?? []), [q.data])
   const majors = useMemo(() => [...new Set(cards.map((c) => c.major).filter(Boolean) as string[])].sort(), [cards])
   const s = search.trim().toLowerCase()
-  const shown = cards.filter((c) => (kind === 'all' || c.kind === kind) && (!major || c.major === major)
+  const onlineCount = cards.filter((c) => !c.me && isOnline(c.seen)).length
+  const shown = cards.filter((c) => (kind === 'all' || (kind === 'online' ? !c.me && isOnline(c.seen) : c.kind === kind)) && (!major || c.major === major)
     && (!s || `${c.name} ${c.major ?? ''} ${c.badges.map((b) => b.label).join(' ')} ${c.headline ?? ''} ${c.interests.join(' ')}`.toLowerCase().includes(s)))
   const count = (k: string) => cards.filter((c) => c.kind === k).length
   return (
@@ -70,10 +75,11 @@ export function People() {
       </div>
       <div className="chips-row">
         {[{ kind: 'all', label: 'Everyone' }, ...GROUPS].map((g) => <button key={g.kind} className={`fchip${kind === g.kind ? ' on' : ''}`} onClick={() => setKind(g.kind)}>{g.label}{g.kind !== 'all' && <span>{count(g.kind)}</span>}</button>)}
+        {onlineCount > 0 && <button className={`fchip fchip-on${kind === 'online' ? ' on' : ''}`} onClick={() => setKind('online')}><i className="dot-on" />Online now<span>{onlineCount}</span></button>}
       </div>
       {q.isLoading ? <Spinner /> : q.error ? <ErrorBox error={q.error} retry={() => q.refetch()} /> : !shown.length ? <Empty icon="people" title="Nobody matches" body="Try another name or clear the filters." /> : (
-        GROUPS.filter((g) => kind === 'all' || g.kind === kind).map((g) => {
-          const list = shown.filter((c) => c.kind === g.kind).sort((a, b) => a.sort - b.sort || a.name.localeCompare(b.name))
+        GROUPS.filter((g) => kind === 'all' || kind === 'online' || g.kind === kind).map((g) => {
+          const list = shown.filter((c) => c.kind === g.kind).sort((a, b) => (g.kind === 'member' ? Number(isOnline(b.seen)) - Number(isOnline(a.seen)) : 0) || a.sort - b.sort || a.name.localeCompare(b.name))
           if (!list.length) return null
           return (
             <section key={g.kind} className="dir-group">

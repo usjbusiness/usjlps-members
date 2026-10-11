@@ -15,6 +15,14 @@ export function Profile() {
   const [f, setF] = useState({ visible: m?.directory_visible ?? true, email: m?.directory_email ?? false, headline: m?.headline ?? '', linkedin: m?.linkedin_url ?? '' })
   const [keep, setKeep] = useState(remember.get())
   const [busy, setBusy] = useState(false)
+  const [showOn, setShowOn] = useState(me.show_activity ?? true)
+  const setActivity = async (v: boolean) => {
+    setShowOn(v)
+    const { error } = await supabase.rpc('member_set_activity', { p_show: v })
+    if (error) { setShowOn(!v); toast.error(error); return }
+    toast.ok(v ? 'Members can see when you are online.' : 'Your online status is now hidden.')
+    qc.invalidateQueries({ queryKey: ['me'] }); qc.invalidateQueries({ queryKey: ['directory'] })
+  }
   const name = m?.full_name ?? me.board?.full_name ?? ''
   const r = rankOf(me.total)
   const save = async () => {
@@ -51,6 +59,7 @@ export function Profile() {
             <label className="fld"><span>LinkedIn <em className="opt-pill">Optional</em></span><input inputMode="url" value={f.linkedin} placeholder="linkedin.com/in/your-name" onChange={(e) => setF({ ...f, linkedin: e.target.value })} /></label>
             <button className="btn btn-gold" disabled={busy} onClick={save}>{busy ? 'Saving…' : 'Save'}</button>
           </> : <p className="muted small">Your e-board profile (photo, title) is managed in the E-Board Portal.</p>}
+          <label className="toggle"><input type="checkbox" checked={showOn} onChange={(e) => void setActivity(e.target.checked)} /><span className="tg" /><span><strong>Show when I'm online</strong><small>A green dot and “Active 2 h ago” next to your name. Turn off to stay invisible.</small></span></label>
           <div className="panel-head sep"><h2>This device</h2></div>
           <label className="toggle"><input type="checkbox" checked={keep} onChange={(e) => { setKeep(e.target.checked); remember.set(e.target.checked) }} /><span className="tg" /><span><strong>Keep me signed in</strong><small>Turn off on shared computers. You will be signed out when the browser closes.</small></span></label>
           {me.board && <a className="btn btn-ghost btn-block" href="https://eboard.usjlps.org" target="_blank" rel="noopener noreferrer"><Icon name="board" size={16} />Open the E-Board Portal<Icon name="ext" size={13} /></a>}
