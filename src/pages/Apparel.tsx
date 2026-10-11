@@ -55,14 +55,16 @@ function Product({ item }: { item: Item }) {
           <div className="swatches">{def.colors.map((c) => <button key={c} className={`sw sw-${c}${c === color ? ' on' : ''}`} onClick={() => setColor(c)} aria-label={COLORS[c].name} title={COLORS[c].name} />)}</div>
         </div>}
         {item === 'polo' && <div className="opt"><span>Size</span><div className="sizes">{SIZES.map((s) => <button key={s} className={s === size ? 'on' : ''} onClick={() => setSize(s)}>{s}</button>)}</div></div>}
-        {req ? (
+        {req && req.status !== 'declined' ? (
           <div className="req-state">
             <span className={`chip chip-st-${req.status}`}>{APPAREL_STATUS[req.status] ?? req.status}</span>
             <span>{[req.size, req.color ? COLORS[req.color as ColorKey]?.name : null].filter(Boolean).join(' · ')}</span>
             {req.status === 'requested' && <button className="link" disabled={busy} onClick={cancel}>Cancel request</button>}
           </div>
-        ) : unlocked ? (
-          <button className="btn btn-gold btn-block" disabled={busy || !me.member} onClick={request}>{busy ? 'Sending…' : `Request my ${item}`}</button>
+        ) : unlocked ? (<>
+          {req && <div className="req-state"><span className="chip chip-st-declined">Declined</span><span>You can send a new request.</span></div>}
+          <button className="btn btn-gold btn-block" disabled={busy || !me.member} onClick={request}>{busy ? 'Sending…' : req ? 'Request again' : `Request my ${item}`}</button>
+        </>
         ) : (
           <div className="locked"><Icon name="lock" size={16} /><span>Unlocks at <b>{def.rank}</b> ({def.min} stickers). {`${left} more sticker${left === 1 ? '' : 's'} to go.`} <Link to="/rank">See my stickers</Link></span></div>
         )}
