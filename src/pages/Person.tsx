@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { COVERS, isOnline, rankOf, seenLabel, useMe, useMemberPage, useAvatar, type PageInfo } from '@/lib/api'
+import { COVERS, PHOTO_COVER_MIN, coverLock, defaultCover, isExecutive, isOnline, rankOf, seenLabel, useMe, useMemberPage, useAvatar, type PageInfo } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
 import { fmtDate } from '@/lib/format'
 import { shrinkImage } from '@/lib/image'
 import { downloadPdf, type Resume } from '@/lib/resume'
 import { supabase } from '@/lib/supabase'
 import { Avatar, Empty, ErrorBox, Icon, Medal, Spinner, useToast } from '@/components/ui'
-import { RankChip, merge, showsRank, type Card } from './People'
+import { RankChip, merge, positions, showsRank, type Card } from './People'
 import { Paper } from './Resume'
 
 const EMPTY: PageInfo = { bio: null, cover: null, avatar_path: null, instagram: null, x_handle: null, tiktok: null, github: null, website: null, show_resume: false, show_attendance: true }
@@ -20,12 +20,13 @@ function fullResume(d: Record<string, unknown>): Resume {
 }
 
 /** Cover ("header"): a preset gradient or an uploaded photo. */
-function Cover({ cover, children }: { cover: string | null; children?: ReactNode }) {
+function Cover({ cover, fallback, children }: { cover: string | null; fallback: string; children?: ReactNode }) {
   const photo = cover && !cover.startsWith('preset:') ? `member-media/${cover}` : null
   const src = useAvatar(photo).data
-  const preset = cover?.startsWith('preset:') ? cover.slice(7) : 'ivy'
+  const preset = cover?.startsWith('preset:') ? cover.slice(7) : fallback
   return (
     <div className={`pp-cover${photo ? ' is-photo' : ` cv-${preset}`}`} style={src ? { backgroundImage: `url("${src}")` } : undefined}>
+      {!photo && preset === 'executive' && <span className="cv-exec-tag"><i />Executive Board<i /></span>}
       {children}
     </div>
   )
@@ -46,6 +47,7 @@ function links(c: Card, p: PageInfo) {
 export function PersonPage() {
   const { key = 'me' } = useParams()
   const q = useMemberPage(key)
+  const meQ = useMe().data
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<PageInfo | null>(null)
   const [busy, setBusy] = useState(false)
@@ -64,6 +66,7 @@ export function PersonPage() {
   const on = !d.is_me && isOnline(card.seen)
   const seen = d.is_me ? null : seenLabel(card.seen)
   const ls = links(card, page)
+  const roles = positions(card)
   const resume = d.resume ? fullResume(d.resume) : null
   const pdf = async () => {
     if (!resume) return
@@ -75,12 +78,12 @@ export function PersonPage() {
     <div className="page pp">
       <Link to="/people" className="link pp-back"><Icon name="back" size={15} />Members</Link>
       <section className="pp-hero">
-        <Cover cover={page.cover} />
+        <Cover cover={page.cover} fallback={defaultCover(total, d.is_me && meQ ? isExecutive(meQ) : card.kind === 'eboard')} />
         <div className="pp-id">
           <Avatar name={card.name} path={draft ? (draft.avatar_path ? `member-media/${draft.avatar_path}` : (d.page?.avatar_path ? null : card.avatar)) : card.avatar} size={116} ring={card.badges[0]?.color} online={on} />
           <div className="pp-name">
             <h1>{card.name}{d.is_me && <em className="you">You</em>}</h1>
-            <div className="badges">{showsRank(card) && <RankChip total={total} big />}{card.badges.filter((b) => !showsRank(card) || b.label !== 'Member').map((b) => <span key={b.label} className={`role${b.dashed ? ' is-dashed' : ''}`} style={{ ['--rc' as string]: b.color }}><i />{b.label}</span>)}</div>
+            {roles.length > 0 && <div className="badges">{roles.map((b) => <span key={b.label} className={`role${b.dashed ? ' is-dashed' : ''}`} style={{ ['--rc' as string]: b.color }}><i />{b.label}</span>)}</div>}{showsRank(card) && <div className="rank-row"><RankChip total={total} big /></div>}
             {card.headline && <p className="pp-headline">{card.headline}</p>}
             <p className="pp-meta">{[card.major, card.year ? `Class of ${card.year}` : null].filter(Boolean).join(' · ')}{seen && <span className={`seen${on ? ' is-on' : ''}`}><i />{seen}</span>}</p>
           </div>
@@ -193,7 +196,9 @@ function Editor({ d, old, set, card, hasResume, done }: { d: PageInfo; old: Page
     if (uploaded.current.length) void supabase.storage.from('member-media').remove(uploaded.current)
     done()
   }
-  const preset = d.cover?.startsWith('preset:') ? d.cover.slice(7) : d.cover ? null : 'ivy'
+  const exec = isExecutive(me)
+  const preset = d.cover?.startsWith('preset:') ? d.cover.slice(7) : d.cover ? null : defaultCover(me.total, exec)
+  const photoLocked = !exec && me.total < PHOTO_COVER_MIN
 
   return (
     <section className="panel pp-edit form">
@@ -202,10 +207,21 @@ function Editor({ d, old, set, card, hasResume, done }: { d: PageInfo; old: Page
         <div>
           <h3>Header</h3>
           <div className="cover-pick">
-            {COVERS.map((c) => <button key={c.key} type="button" className={`cv-${c.key}${preset === c.key ? ' on' : ''}`} onClick={() => p({ cover: `preset:${c.key}` })} aria-label={c.label} title={c.label}>{preset === c.key && <Icon name="check" size={16} />}</button>)}
-            <button type="button" className={`cover-up${!preset ? ' on' : ''}`} disabled={busy === 'cover'} onClick={() => coverIn.current?.click()}><Icon name="camera" size={16} />{busy === 'cover' ? 'Uploading…' : 'Upload photo'}</button>
+            {COVERS.filter((c) => !('board' in c) || exec).map((c) => {
+              const lock = coverLock(c.key, me.total, exec)
+              return (
+                <button key={c.key} type="button" className={`cover-opt${preset === c.key ? ' on' : ''}${lock ? ' is-locked' : ''}`} disabled={!!lock}
+                  onClick={() => p({ cover: `preset:${c.key}` })} title={lock ? `Unlocks at ${lock.replace(' · ', ' (')} stickers)` : c.label}>
+                  <span className={`sw cv-${c.key}`}>{lock ? <Icon name="lock" size={15} /> : preset === c.key ? <Icon name="check" size={16} /> : null}</span>
+                  <b>{c.label}</b><small>{lock ?? (c.key === 'executive' ? 'E-Board' : c.min ? 'Unlocked' : 'Everyone')}</small>
+                </button>
+              )
+            })}
           </div>
-          <small className="hint">A wide photo works best (for example 1500 × 500).</small>
+          <button type="button" className={`cover-up${!preset ? ' on' : ''}`} disabled={busy === 'cover' || photoLocked} onClick={() => coverIn.current?.click()}>
+            <Icon name={photoLocked ? 'lock' : 'camera'} size={16} />{busy === 'cover' ? 'Uploading…' : photoLocked ? 'Own header photo · unlocks at Gold' : 'Upload my own photo'}
+          </button>
+          <small className="hint">New headers unlock as you earn stickers. {photoLocked ? 'At Gold you can upload your own photo.' : 'A wide photo works best (for example 1500 × 500).'}</small>
           <input ref={coverIn} type="file" accept="image/*" hidden onChange={(e) => { void upload(e.target.files?.[0], 'cover'); e.target.value = '' }} />
 
           <h3>Profile photo</h3>

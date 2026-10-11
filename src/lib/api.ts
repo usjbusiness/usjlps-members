@@ -77,10 +77,10 @@ export const useAvatar = (path: string | null | undefined) => useQuery({
 // ---- Ranks ---------------------------------------------------------------
 export const RANKS = [
   { key: 'member', name: 'Member', min: 0, perk: 'Every event, the member portal, the library and the GroupMe chat.' },
-  { key: 'bronze', name: 'Bronze', min: 3, perk: 'The LPS lapel pin and an LPS sticker, requested right here in the portal.' },
-  { key: 'silver', name: 'Silver', min: 6, perk: 'The LPS polo and a signed LPS certificate for your résumé and LinkedIn.' },
-  { key: 'gold', name: 'Gold', min: 10, perk: 'Priority seats and meet-and-greets with headline guests.' },
-  { key: 'ivy', name: 'Ivy', min: 15, perk: 'Company trips, an e-board reference and the chance to co-host.' },
+  { key: 'bronze', name: 'Bronze', min: 3, perk: 'The LPS lapel pin and an LPS sticker, requested right here in the portal. Bronze page headers.' },
+  { key: 'silver', name: 'Silver', min: 6, perk: 'The LPS polo and a signed LPS certificate for your résumé and LinkedIn. Silver page headers.' },
+  { key: 'gold', name: 'Gold', min: 10, perk: 'Priority seats and meet-and-greets with headline guests. The Gold header and your own header photo.' },
+  { key: 'ivy', name: 'Ivy', min: 15, perk: 'Company trips, an e-board reference and the chance to co-host. The green Ivy headers.' },
 ] as const
 export type Rank = (typeof RANKS)[number]
 export function rankOf(total: number) {
@@ -174,7 +174,26 @@ export interface MemberPage {
   resume: Record<string, unknown> | null; has_resume: boolean
 }
 export const useMemberPage = (key: string) => useQuery({ queryKey: ['page', key], staleTime: 30_000, queryFn: () => rpc<MemberPage | null>('member_page', { p_key: key }) })
+/** Page headers. min = stickers needed; board = Executive Board only. Photo headers unlock at Gold. */
 export const COVERS = [
-  { key: 'ivy', label: 'Ivy' }, { key: 'gold', label: 'Gold' }, { key: 'onyx', label: 'Onyx' },
-  { key: 'navy', label: 'Navy' }, { key: 'burgundy', label: 'Burgundy' }, { key: 'dawn', label: 'Dawn' },
+  { key: 'onyx', label: 'Onyx', min: 0 }, { key: 'navy', label: 'Navy', min: 0 },
+  { key: 'bronze', label: 'Bronze', min: 3 }, { key: 'burgundy', label: 'Burgundy', min: 3 },
+  { key: 'silver', label: 'Silver', min: 6 }, { key: 'sapphire', label: 'Sapphire', min: 6 },
+  { key: 'gold', label: 'Gold', min: 10 },
+  { key: 'ivy', label: 'Ivy', min: 15 }, { key: 'dawn', label: 'Dawn', min: 15 },
+  { key: 'executive', label: 'Executive', min: 0, board: true },
 ] as const
+export const PHOTO_COVER_MIN = 10
+const NOT_EBOARD = ['major_lead', 'faculty_advisor', 'campus_activities']
+/** Student officers (not advisors or major leaders): they get the Executive header and every other one. */
+export const isExecutive = (me: Me) => !!me.board && !NOT_EBOARD.includes(me.board.role)
+/** Null when unlocked, otherwise a short "Silver · 6" style label. */
+export function coverLock(key: string, total: number, exec: boolean): string | null {
+  if (exec) return null
+  const c = COVERS.find((x) => x.key === key)
+  if (!c) return 'Locked'
+  if ('board' in c && c.board) return 'E-Board only'
+  return total >= c.min ? null : `${rankOf(c.min).rank.name} · ${c.min}`
+}
+/** Header shown until someone picks one: their rank's colour, or Executive for the e-board. */
+export const defaultCover = (total: number, exec: boolean) => exec ? 'executive' : ({ member: 'onyx', bronze: 'bronze', silver: 'silver', gold: 'gold', ivy: 'ivy' } as const)[rankOf(total).rank.key]

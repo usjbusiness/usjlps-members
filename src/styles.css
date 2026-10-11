@@ -705,3 +705,48 @@ html, body { overflow-x: hidden; }
 .pp-edit-bar { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--hair); }
 @media (max-width: 999px) { .pp-edit-bar { position: sticky; bottom: calc(var(--tabs) + var(--safe-b, 0px)); background: #121212; margin: 18px -20px -20px; padding: 14px 20px; border-radius: 0 0 var(--r) var(--r); } }
 @media (max-width: 560px) { .soc-grid { grid-template-columns: 1fr; } .pp-id > .avatar { width: 96px !important; height: 96px !important; margin-top: -48px; } }
+
+/* ---- Positions above rank ---- */
+.rank-row { display: flex; margin-top: 6px; }
+.badges + .rank-row { margin-top: 7px; }
+
+/* ---- Header picker with unlocks ---- */
+.cover-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; }
+.cover-pick > .cover-opt { width: auto; height: auto; display: grid; gap: 3px; padding: 0; border: 0; background: none; color: var(--ivory); text-align: left; overflow: visible; }
+.cover-opt .sw { height: 46px; border-radius: 10px; border: 1px solid var(--hair); display: grid; place-items: center; color: #fff; position: relative; overflow: hidden; }
+.cover-opt .sw::before { display: none; }
+.cover-opt b { font-weight: 500; font-size: 12.5px; margin-top: 4px; }
+.cover-opt small { font-size: 10.5px; color: var(--dim); letter-spacing: .02em; }
+.cover-opt.on .sw { box-shadow: 0 0 0 2px var(--ink), 0 0 0 4px var(--gold); }
+.cover-opt.is-locked { cursor: not-allowed; }
+.cover-opt.is-locked .sw { filter: grayscale(.85) brightness(.45); }
+.cover-opt.is-locked .sw svg { filter: none; color: #fff; }
+.cover-opt.is-locked b { color: var(--dim); }
+.cover-opt:not(.is-locked):hover .sw { border-color: var(--gold); }
+.cover-up { margin-top: 12px; min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px dashed var(--line2); display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .03); color: var(--ivory); font-size: 13px; }
+.cover-up.on { border-style: solid; border-color: var(--gold); }
+.cover-up:disabled { color: var(--dim); cursor: not-allowed; }
+
+/* New headers */
+.cv-bronze { background: radial-gradient(100% 150% at 82% 0%, #e2a774 0%, transparent 52%), linear-gradient(118deg, #3a2010, #8a5531 55%, #4d2c15); }
+.cv-silver { background: radial-gradient(90% 160% at 80% 0%, #ffffff 0%, transparent 48%), linear-gradient(115deg, #3f454d, #aeb6bf 50%, #5c636c); }
+.cv-sapphire { background: radial-gradient(110% 150% at 85% 0%, #4f8fe8 0%, transparent 52%), linear-gradient(120deg, #06142e, #123d8a 58%, #0a2457); }
+
+/* Executive Board: black, gold foil sheen, double frame and crest */
+.cv-executive { background:
+  linear-gradient(105deg, transparent 30%, rgba(246, 227, 166, .2) 45%, rgba(255, 245, 210, .38) 50%, rgba(246, 227, 166, .2) 55%, transparent 70%) 0 0 / 300% 100% no-repeat,
+  repeating-linear-gradient(90deg, rgba(201, 165, 76, .07) 0 1px, transparent 1px 14px),
+  radial-gradient(70% 120% at 50% 120%, rgba(201, 165, 76, .28), transparent 60%),
+  radial-gradient(60% 100% at 85% -10%, rgba(201, 165, 76, .22), transparent 60%),
+  #050505; animation: foil 7s ease-in-out infinite; }
+@keyframes foil { 0%, 15% { background-position: 120% 0, 0 0, 0 0, 0 0, 0 0; } 60%, 100% { background-position: -20% 0, 0 0, 0 0, 0 0, 0 0; } }
+.pp-cover.cv-executive { box-shadow: inset 0 0 0 1px rgba(201, 165, 76, .55), inset 0 0 0 7px #050505, inset 0 0 0 8px rgba(201, 165, 76, .35); }
+.pp-cover.cv-executive::before { opacity: .5 !important; left: 50%; right: auto; transform: translate(-50%, -50%) !important; width: clamp(110px, 18vw, 170px) !important; filter: drop-shadow(0 0 18px rgba(201, 165, 76, .45)); }
+.cv-exec-tag { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 1; display: flex; align-items: center; gap: 12px; white-space: nowrap;
+  font: 600 10.5px/1 var(--sans); letter-spacing: .42em; text-transform: uppercase; color: var(--gold2); text-shadow: 0 0 12px rgba(201, 165, 76, .6); }
+.cv-exec-tag i { width: 38px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.cv-exec-tag i:last-child { transform: scaleX(-1); }
+@media (max-width: 560px) { .cv-exec-tag { display: none; } }
+@media (prefers-reduced-motion: reduce) { .cv-executive { animation: none; } }
+.cover-pick > .cover-opt.on { box-shadow: none; }
+.cover-pick > .cover-opt { justify-items: stretch; } .cover-opt .sw { width: 100%; } .cover-opt b, .cover-opt small { justify-self: start; }

@@ -40,18 +40,21 @@ export function RankChip({ total, big }: { total: number; big?: boolean }) {
   const r = rankOf(total).rank
   return <span className={`rank-chip r-${r.key}${big ? ' is-big' : ''}`} title={`${r.name} · ${total} sticker${total === 1 ? '' : 's'}`}><Medal rank={r.key} size={big ? 18 : 13} />{r.name}</span>
 }
+/** Positions first (President, Major Lead…); plain members show only their rank. */
+export const positions = (c: Card) => (showsRank(c) ? c.badges.filter((b) => b.label !== 'Member') : c.badges)
 export const showsRank = (c: Pick<Card, 'kind' | 'total'>) => c.kind !== 'advisor' || c.total > 0
 
 function PersonCard({ c }: { c: Card }) {
   const on = !c.me && isOnline(c.seen)
   const label = c.me ? null : seenLabel(c.seen)
+  const roles = positions(c)
   return (
     <article className={`person kind-${c.kind}${c.me ? ' is-me' : ''}`}>
       <Link to={`/people/${c.me ? 'me' : c.key}`} className="person-open" aria-label={`Open ${c.name}'s page`}>
       <Avatar name={c.name} path={c.avatar} size={c.kind === 'member' ? 46 : 58} ring={c.badges[0]?.color} online={on} />
       <div className="person-main">
         <strong>{c.name}{c.me && <em className="you">You</em>}</strong>
-        <div className="badges">{showsRank(c) && <RankChip total={c.total} />}{c.badges.filter((b) => !showsRank(c) || b.label !== 'Member').map((b) => <span key={b.label} className={`role${b.dashed ? ' is-dashed' : ''}`} style={{ ['--rc' as string]: b.color }}><i />{b.label}</span>)}</div>
+        {roles.length > 0 && <div className="badges">{roles.map((b) => <span key={b.label} className={`role${b.dashed ? ' is-dashed' : ''}`} style={{ ['--rc' as string]: b.color }}><i />{b.label}</span>)}</div>}{showsRank(c) && <div className="rank-row"><RankChip total={c.total} /></div>}
         <small>{[c.major, c.year ? `Class of ${c.year}` : null].filter(Boolean).join(' · ')}</small>
         {c.headline && <p className="person-head">{c.headline}</p>}
         {label && <p className={`seen${on ? ' is-on' : ''}`}><i />{label}</p>}
@@ -75,7 +78,7 @@ export function People() {
   const s = search.trim().toLowerCase()
   const onlineCount = cards.filter((c) => !c.me && isOnline(c.seen)).length
   const shown = cards.filter((c) => (kind === 'all' || (kind === 'online' ? !c.me && isOnline(c.seen) : c.kind === kind)) && (!major || c.major === major)
-    && (!s || `${c.name} ${c.major ?? ''} ${c.badges.filter((b) => !showsRank(c) || b.label !== 'Member').map((b) => b.label).join(' ')} ${c.headline ?? ''} ${c.interests.join(' ')}`.toLowerCase().includes(s)))
+    && (!s || `${c.name} ${c.major ?? ''} ${c.badges.map((b) => b.label).join(' ')} ${rankOf(c.total).rank.name} ${c.headline ?? ''} ${c.interests.join(' ')}`.toLowerCase().includes(s)))
   const count = (k: string) => cards.filter((c) => c.kind === k).length
   return (
     <div className="page">
