@@ -17,6 +17,8 @@ export const MORE = [
   { to: '/rank', label: 'Rank & Stickers', icon: 'medal' },
   { to: '/apparel', label: 'LPS Merch', icon: 'shirt' },
   { to: '/propose', label: 'Propose an Event', icon: 'bulb' },
+  { to: '/record', label: 'My Record', icon: 'record' },
+  { to: '/resume', label: 'Résumé Builder', icon: 'resume' },
   { to: '/install', label: 'Get the App', icon: 'phone' },
   { to: '/profile', label: 'My Profile', icon: 'user' },
 ]

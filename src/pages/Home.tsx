@@ -113,8 +113,8 @@ export function Home() {
         {groupme ? <a href={groupme} target="_blank" rel="noopener noreferrer" className="qa"><Icon name="chat" size={22} /><strong>GroupMe chat</strong><small>Talk with the whole Society</small></a>
           : <Link to="/people" className="qa"><Icon name="people" size={22} /><strong>Members</strong><small>Advisors, e-board and members</small></Link>}
         <Link to="/notes" className="qa"><Icon name="note" size={22} /><strong>My notes</strong><small>Private notes from every meeting</small></Link>
-        <Link to="/apparel" className="qa"><Icon name="shirt" size={22} /><strong>LPS merch</strong><small>Pin at Bronze, polo at Silver</small></Link>
-        <Link to="/propose" className="qa"><Icon name="bulb" size={22} /><strong>Propose an event</strong><small>Your idea could be next</small></Link>
+        <Link to="/resume" className="qa"><Icon name="resume" size={22} /><strong>Résumé builder</strong><small>USJ format, Word or PDF</small></Link>
+        <Link to="/record" className="qa"><Icon name="record" size={22} /><strong>My record</strong><small>Every meeting and sticker, as a PDF</small></Link>
         <Link to="/install" className="qa"><Icon name="phone" size={22} /><strong>Get the app</strong><small>Add LPS to your home screen</small></Link>
       </section>
     </div>

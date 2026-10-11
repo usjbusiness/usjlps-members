@@ -19,6 +19,7 @@ export function RankPage() {
           <p className="rank-count"><b>{me.total}</b> sticker{me.total === 1 ? '' : 's'}{r.next && <> · <b>{r.toNext}</b> more to {r.next.name}</>}</p>
           <div className="bar bar-lg"><i style={{ width: `${r.pct}%` }} /></div>
           <p className="muted small">{r.rank.perk}</p>
+          <Link to="/record" className="more" style={{ marginTop: 10 }}><Icon name="record" size={14} />My full record (PDF)<Icon name="arrow" size={13} /></Link>
         </div>
       </section>
 

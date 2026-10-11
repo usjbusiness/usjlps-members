@@ -39,6 +39,10 @@ const P: Record<string, ReactNode> = {
   note: <><path d="M6 3.5h8.5L19 8v12.5H6Z" /><path d="M14 3.5V8h5M9 12h7M9 15.5h7M9 9h3" /></>,
   pinned: <><path d="M9 4h6l-1 5 3 3v1.5H7V12l3-3Z" /><path d="M12 13.5V20" /></>,
   trash: <><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13" /></>,
+  up: <path d="M6 15l6-6 6 6" />,
+  down: <path d="M6 9l6 6 6-6" />,
+  record: <><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4V2.8h6V4M8.5 10h7M8.5 13.5h7M8.5 17h4" /></>,
+  resume: <><path d="M6 3.5h8.5L19 8v12.5H6Z" /><circle cx="10.5" cy="10" r="2" /><path d="M7.8 15c.5-1.6 1.5-2.4 2.7-2.4s2.2.8 2.7 2.4M14 9.5h2.5M14 12.5h2.5M8.5 18h8" /></>,
   board: <><rect x="3.5" y="4.5" width="17" height="12" rx="1.5" /><path d="M8 20.5l4-4 4 4M7.5 9.5h9M7.5 12.5h5" /></>,
 }
 export type IconName = keyof typeof P

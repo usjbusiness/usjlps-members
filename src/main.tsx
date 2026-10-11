@@ -27,6 +27,8 @@ import { Propose } from '@/pages/Propose'
 import { Install } from '@/pages/Install'
 import { Profile } from '@/pages/Profile'
 import { NotesPage } from '@/pages/Notes'
+import { RecordPage } from '@/pages/Record'
+import { ResumePage } from '@/pages/Resume'
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: true } } })
 
@@ -62,6 +64,8 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="news" element={<News />} />
                   <Route path="events" element={<Events />} />
                   <Route path="notes" element={<NotesPage />} />
+                  <Route path="record" element={<RecordPage />} />
+                  <Route path="resume" element={<ResumePage />} />
                   <Route path="people" element={<People />} />
                   <Route path="rank" element={<RankPage />} />
                   <Route path="apparel" element={<ApparelPage />} />

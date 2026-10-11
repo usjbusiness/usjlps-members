@@ -141,3 +141,22 @@ export function seenLabel(ts?: string | null) {
   if (d < 7) return `Active ${d} days ago`
   return `Active ${new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
 }
+
+// ---- My Record -----------------------------------------------------------------
+export interface History {
+  member: { id: string; full_name: string; email: string; major: string | null; grad_year: number | null; date_joined: string } | null
+  meetings: { id: string; title: string; starts_at: string; headliner: boolean; status: 'present' | 'absent' | 'excused' | null }[]
+  awards: { title: string; earned_on: string; value: number; event: string | null; awarded_by: string | null; created_at: string }[]
+  requests: { item: string; size: string | null; color: string | null; status: string; created_at: string; updated_at: string }[]
+  generated_at: string
+}
+export const useHistory = () => useQuery({ queryKey: ['history'], staleTime: 60_000, queryFn: () => rpc<History>('member_history') })
+export interface Resume0 { data: Record<string, unknown>; updated_at: string }
+export const useResume = () => useQuery({
+  queryKey: ['resume'], staleTime: Infinity, refetchOnWindowFocus: false,
+  queryFn: async () => {
+    const { data, error } = await supabase.from('member_resumes').select('data, updated_at').maybeSingle()
+    if (error) throw error
+    return (data ?? null) as Resume0 | null
+  },
+})
