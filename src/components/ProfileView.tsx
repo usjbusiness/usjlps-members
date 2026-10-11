@@ -2,7 +2,7 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react'
 import { MAJOR_ROLE, ROLE_COLOR, rankOf, useAvatar, type MemberPage } from '@/lib/api'
 import { fmtDate, initials } from '@/lib/format'
-import { shrinkImage } from '@/lib/image'
+import { logoImage, shrinkImage } from '@/lib/image'
 import { EMPLOYMENT, LANG_LEVELS, MONTHS, OPEN_TO, fmtYm, prettyUrl, safeUrl, sorted, span, uid, type Entry, type Lang, type ListKey, type Profile } from '@/lib/profile'
 import { supabase } from '@/lib/supabase'
 import { Avatar, Icon, Medal, Modal, useToast } from './ui'
@@ -265,7 +265,7 @@ export function EntryModal({ k, entry, userId, onSave, onClose }: { k: ListKey; 
     try {
       const logo = imgKey === 'logo'
       const png = logo || file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/gif'
-      const blob = await shrinkImage(file, logo ? 320 : 1200, logo ? 320 : 800, logo, png ? 'image/png' : 'image/jpeg')
+      const blob = logo ? await logoImage(file) : await shrinkImage(file, 1200, 800, false, png ? 'image/png' : 'image/jpeg')
       const path = `${userId}/${logo ? 'logo' : 'img'}-${Date.now().toString(36)}.${png ? 'png' : 'jpg'}`
       const { error } = await supabase.storage.from('member-media').upload(path, blob, { contentType: png ? 'image/png' : 'image/jpeg', cacheControl: '31536000' })
       if (error) throw error
@@ -295,7 +295,7 @@ export function EntryModal({ k, entry, userId, onSave, onClose }: { k: ListKey; 
             <Thumb path={imgVal} name={k === 'awards' ? '' : String(e.org ?? e.school ?? e.issuer ?? e.name ?? e.title ?? '')} icon={d.icon} wide={imgKey === 'image'} />
             <div>
               <strong>{imgKey === 'logo' ? 'Logo' : k === 'awards' ? 'Photo or logo' : 'Image'}</strong>
-              <small>{imgKey === 'logo' ? 'Upload the company or school logo (square works best).' : k === 'awards' ? 'A photo of the trophy, medal, certificate or team, or the league logo.' : 'Optional cover image for this item.'}</small>
+              <small>{imgKey === 'logo' ? 'Upload the logo. A plain white or black background is removed automatically.' : k === 'awards' ? 'A photo of the trophy, medal, certificate or team, or the league logo.' : 'Optional cover image for this item.'}</small>
               <span className="row-gap"><button type="button" className="btn btn-ghost btn-sm" disabled={busy === 'img'} onClick={() => fileIn.current?.click()}><Icon name="camera" size={14} />{busy === 'img' ? 'Uploading…' : imgVal ? 'Change' : 'Upload'}</button>{imgVal && <button type="button" className="link" onClick={() => set({ [imgKey]: null })}>Remove</button>}</span>
             </div>
             <input ref={fileIn} type="file" accept="image/*" hidden onChange={(x) => { void upload(x.target.files?.[0]); x.target.value = '' }} />

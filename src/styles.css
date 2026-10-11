@@ -937,3 +937,7 @@ dl.pp-facts { margin: 0; display: grid; gap: 4px; }
 .thumb.is-photo.has-img { background: #000; }
 .thumb.is-photo img { object-fit: cover; }
 @media (max-width: 480px) { .thumb.is-photo { width: 60px; height: 60px; } }
+/* Logos: no background, only a thin gold frame */
+.thumb, .thumb.has-img, .thumb.is-photo.has-img, .thumb.is-wide.has-img { background: transparent; border: 1px solid var(--line2); }
+.thumb.has-img:not(.is-photo):not(.is-wide) { padding: 6px; }
+.thumb.has-img:not(.is-photo):not(.is-wide) img { object-fit: contain; }
