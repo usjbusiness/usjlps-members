@@ -6,7 +6,7 @@ export interface EduP { id: string; school: string; degree: string; field: strin
 export interface Cert { id: string; name: string; issuer: string; issued: string; expires: string; credential_id: string; url: string; logo?: string | null }
 export interface Proj { id: string; name: string; start: string; end: string; current: boolean; url: string; description: string; image?: string | null }
 export interface Vol { id: string; role: string; org: string; cause: string; start: string; end: string; current: boolean; description: string; logo?: string | null }
-export interface Award { id: string; title: string; issuer: string; date: string; description: string }
+export interface Award { id: string; title: string; issuer: string; date: string; description: string; image?: string | null }
 export interface Lang { id: string; name: string; level: string }
 export interface Feat { id: string; title: string; url: string; description: string; image?: string | null }
 export interface Profile {
@@ -64,7 +64,7 @@ export const prettyUrl = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '').re
 
 export const imagesOf = (p: Profile) => {
   const out: string[] = []
-  for (const k of ['experience', 'education', 'certifications', 'projects', 'volunteering', 'featured'] as const)
+  for (const k of ['experience', 'education', 'certifications', 'projects', 'volunteering', 'awards', 'featured'] as const)
     for (const e of (p[k] ?? []) as { logo?: string | null; image?: string | null }[]) { if (e.logo) out.push(e.logo); if (e.image) out.push(e.image) }
   return out
 }

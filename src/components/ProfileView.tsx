@@ -103,13 +103,13 @@ export const DEF: Record<ListKey, { title: string; icon: string; img?: 'logo' | 
   certifications: { title: 'Licenses & certifications', icon: 'cert', img: 'logo', add: 'Add license or certification' },
   projects: { title: 'Projects', icon: 'folder', img: 'image', add: 'Add project' },
   volunteering: { title: 'Volunteering', icon: 'heart', img: 'logo', add: 'Add volunteer experience' },
-  awards: { title: 'Honors & awards', icon: 'trophy', add: 'Add honor or award' },
+  awards: { title: 'Honors & awards', icon: 'trophy', img: 'image', add: 'Add honor or award' },
 }
 export const ORDER: ListKey[] = ['featured', 'experience', 'education', 'certifications', 'projects', 'volunteering', 'awards']
 
-function Thumb({ path, name, icon, wide }: { path?: string | null; name: string; icon: string; wide?: boolean }) {
+function Thumb({ path, name, icon, wide, photo }: { path?: string | null; name: string; icon: string; wide?: boolean; photo?: boolean }) {
   const src = useAvatar(path ? `member-media/${path}` : null).data
-  return <span className={`thumb${wide ? ' is-wide' : ''}${src ? ' has-img' : ''}`}>{src ? <img src={src} alt="" loading="lazy" /> : name.trim() ? <b>{initials(name)}</b> : <Icon name={icon} size={20} />}</span>
+  return <span className={`thumb${wide ? ' is-wide' : ''}${photo ? ' is-photo' : ''}${src ? ' has-img' : ''}`}>{src ? <img src={src} alt="" loading="lazy" /> : name.trim() ? <b>{initials(name)}</b> : <Icon name={icon} size={20} />}</span>
 }
 function view(k: ListKey, e: Record<string, string & boolean>) {
   const join = (...xs: (string | undefined)[]) => xs.filter(Boolean).join(' · ')
@@ -119,7 +119,7 @@ function view(k: ListKey, e: Record<string, string & boolean>) {
     case 'certifications': return { title: e.name, sub: e.issuer, when: join(e.issued ? `Issued ${fmtYm(e.issued)}` : '', e.expires ? `Expires ${fmtYm(e.expires)}` : ''), extra: e.credential_id ? `Credential ID ${e.credential_id}` : '', desc: '', url: e.url, urlLabel: 'Show credential', name: e.issuer || e.name }
     case 'projects': return { title: e.name, sub: '', when: [fmtYm(e.start), e.current ? 'Present' : fmtYm(e.end)].filter(Boolean).join(' – '), extra: '', desc: e.description, url: e.url, urlLabel: 'Open project', name: e.name }
     case 'volunteering': return { title: e.role, sub: e.org, when: span(e.start, e.end, e.current), extra: e.cause, desc: e.description, name: e.org }
-    case 'awards': return { title: e.title, sub: e.issuer ? `Issued by ${e.issuer}` : '', when: fmtYm(e.date), extra: '', desc: e.description, name: e.title }
+    case 'awards': return { title: e.title, sub: e.issuer ? `Issued by ${e.issuer}` : '', when: fmtYm(e.date), extra: '', desc: e.description, name: '' }
     case 'featured': return { title: e.title, sub: '', when: '', extra: '', desc: e.description, url: e.url, urlLabel: 'Open', name: e.title }
   }
 }
@@ -150,7 +150,7 @@ export function Section({ k, profile, owner }: { k: ListKey; profile: Profile; o
         : items.map((e) => { const x = view(k, e as never); const u = safeUrl(x.url)
             return (
               <article key={e.id} className="ent">
-                {d.img && <Thumb path={(e as { logo?: string; image?: string })[d.img]} name={x.name ?? ''} icon={d.icon} />}
+                {d.img && <Thumb path={(e as { logo?: string; image?: string })[d.img]} name={x.name ?? ''} icon={d.icon} photo={d.img === 'image'} />}
                 <div className="ent-main">
                   <strong>{x.title}</strong>
                   {x.sub && <span>{x.sub}</span>}
@@ -264,9 +264,10 @@ export function EntryModal({ k, entry, userId, onSave, onClose }: { k: ListKey; 
     setBusy('img')
     try {
       const logo = imgKey === 'logo'
-      const blob = await shrinkImage(file, logo ? 320 : 1200, logo ? 320 : 800, logo, logo ? 'image/png' : 'image/jpeg')
-      const path = `${userId}/${logo ? 'logo' : 'img'}-${Date.now().toString(36)}.${logo ? 'png' : 'jpg'}`
-      const { error } = await supabase.storage.from('member-media').upload(path, blob, { contentType: logo ? 'image/png' : 'image/jpeg', cacheControl: '31536000' })
+      const png = logo || file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/gif'
+      const blob = await shrinkImage(file, logo ? 320 : 1200, logo ? 320 : 800, logo, png ? 'image/png' : 'image/jpeg')
+      const path = `${userId}/${logo ? 'logo' : 'img'}-${Date.now().toString(36)}.${png ? 'png' : 'jpg'}`
+      const { error } = await supabase.storage.from('member-media').upload(path, blob, { contentType: png ? 'image/png' : 'image/jpeg', cacheControl: '31536000' })
       if (error) throw error
       up.current.push(path); set({ [imgKey]: path })
     } catch (x) { toast.error(x) } finally { setBusy('') }
@@ -291,10 +292,10 @@ export function EntryModal({ k, entry, userId, onSave, onClose }: { k: ListKey; 
       <div className="mform">
         {imgKey && (
           <div className="mf-img">
-            <Thumb path={imgVal} name={String(e.org ?? e.school ?? e.issuer ?? e.name ?? e.title ?? '')} icon={d.icon} wide={imgKey === 'image'} />
+            <Thumb path={imgVal} name={k === 'awards' ? '' : String(e.org ?? e.school ?? e.issuer ?? e.name ?? e.title ?? '')} icon={d.icon} wide={imgKey === 'image'} />
             <div>
-              <strong>{imgKey === 'logo' ? 'Logo' : 'Image'}</strong>
-              <small>{imgKey === 'logo' ? 'Upload the company or school logo (square works best).' : 'Optional cover image for this item.'}</small>
+              <strong>{imgKey === 'logo' ? 'Logo' : k === 'awards' ? 'Photo or logo' : 'Image'}</strong>
+              <small>{imgKey === 'logo' ? 'Upload the company or school logo (square works best).' : k === 'awards' ? 'A photo of the trophy, medal, certificate or team, or the league logo.' : 'Optional cover image for this item.'}</small>
               <span className="row-gap"><button type="button" className="btn btn-ghost btn-sm" disabled={busy === 'img'} onClick={() => fileIn.current?.click()}><Icon name="camera" size={14} />{busy === 'img' ? 'Uploading…' : imgVal ? 'Change' : 'Upload'}</button>{imgVal && <button type="button" className="link" onClick={() => set({ [imgKey]: null })}>Remove</button>}</span>
             </div>
             <input ref={fileIn} type="file" accept="image/*" hidden onChange={(x) => { void upload(x.target.files?.[0]); x.target.value = '' }} />

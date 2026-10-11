@@ -933,3 +933,7 @@ dl.pp-facts { margin: 0; display: grid; gap: 4px; }
   .pp-actions .btn { flex: 1 1 auto; }
 }
 .pp-av { justify-self: start; width: max-content; }
+.thumb.is-photo { width: 72px; height: 72px; border-radius: 12px; }
+.thumb.is-photo.has-img { background: #000; }
+.thumb.is-photo img { object-fit: cover; }
+@media (max-width: 480px) { .thumb.is-photo { width: 60px; height: 60px; } }
