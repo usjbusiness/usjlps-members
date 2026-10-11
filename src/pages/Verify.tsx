@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useVerifyCertificate } from '@/lib/api'
-import { CERT_TITLE, ORG, rankName } from '@/lib/certificate'
+import { ORG, certName, rankName } from '@/lib/certificate'
 import { fmtDate } from '@/lib/format'
 import { Icon, Medal, Spinner } from '@/components/ui'
 import { Foot, TopBar } from './Public'
@@ -34,7 +34,7 @@ export function VerifyPage() {
               <div>
                 <span className="chip chip-ok"><Icon name="verified" size={13} />Valid certificate</span>
                 <h2>{d.name}</h2>
-                <p>{CERT_TITLE} · <b>{rankName(d.rank_key)} Rank</b></p>
+                <p>{certName(d.rank_key)} · <b>{rankName(d.rank_key)} Rank</b></p>
                 <p className="muted small">Issued by the {ORG}, University of Saint Joseph{d.issued_at ? ` on ${fmtDate(d.issued_at, { month: 'long', day: 'numeric', year: 'numeric' })}` : ''}.</p>
                 <dl className="vfy-dl">
                   <div><dt>Credential ID</dt><dd className="mono">{d.cert_no}</dd></div>
@@ -44,7 +44,7 @@ export function VerifyPage() {
               </div>
             </div>
           ) : <div className="vfy-card is-bad"><Icon name="close" size={22} /><div><h2>This certificate was revoked</h2><p className="muted">Certificate <b className="mono">{d.cert_no}</b> issued to {d.name} is no longer valid.</p></div></div>}
-        <p className="muted small vfy-about">Members earn this certificate by reaching Silver rank (6+ engagement stickers from LPS events), completing a professional résumé and keeping a professional profile.</p>
+        <p className="muted small vfy-about">Members earn this certificate by reaching Silver rank (6+ engagement stickers from LPS events), completing a professional résumé and keeping a professional profile. Gold (10+) is awarded “with Distinction” and Ivy (15+) “with Highest Distinction”.</p>
       </div>
       <Foot />
     </div>

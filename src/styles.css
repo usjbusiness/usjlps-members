@@ -1002,3 +1002,16 @@ dl.pp-facts { margin: 0; display: grid; gap: 4px; }
   .csteps li > .more { grid-column: 2; margin-top: -4px; }
   .vfy-card { flex-direction: column; }
 }
+.cert-dist { font: italic 400 2.3cqw/1 'Times New Roman', Times, serif; color: #B08C3A; margin: .9cqw 0 0; }
+.cert-levels { display: grid; gap: 8px; margin-top: 16px; }
+.cert-lv { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border: 1px solid var(--hair); border-radius: 14px; background: rgba(255, 255, 255, .02); }
+.cert-lv .cert-seal { width: 38px; height: 38px; font-size: 7px; letter-spacing: .08em; opacity: .45; box-shadow: none; }
+.cert-lv.is-open .cert-seal, .cert-lv.is-ok .cert-seal { opacity: 1; }
+.cert-lv.is-ok { border-color: rgba(88, 185, 135, .35); }
+.cert-lv strong { display: block; font-size: 14px; font-weight: 600; }
+.cert-lv small { color: var(--mute); font-size: 12px; }
+.cert-side { display: grid; gap: 16px; }
+.cert-pick { margin: 12px 0 0; }
+.cert-pick .chip { cursor: pointer; height: 28px; }
+.cert-up { border-color: var(--line2); background: linear-gradient(180deg, rgba(201, 165, 76, .09), rgba(201, 165, 76, .015)); }
+.cert-side .panel > p + .fld, .cert-side .panel > .csteps + .fld { margin-top: 14px; }

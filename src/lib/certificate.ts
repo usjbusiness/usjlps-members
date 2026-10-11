@@ -6,6 +6,10 @@ import { supabase } from './supabase'
 
 export const CERT_TITLE = 'Certificate of Achievement'
 export const ORG = 'USJ Leadership & Professional Society'
+/** Gold and Ivy certificates carry a distinction line. */
+export const distinction = (k?: string | null) => k === 'ivy' ? 'with Highest Distinction' : k === 'gold' ? 'with Distinction' : null
+export const certName = (k?: string | null) => [CERT_TITLE, distinction(k)].filter(Boolean).join(' ')
+export const LEVEL_MIN: Record<string, number> = { silver: 6, gold: 10, ivy: 15 }
 export const verifyUrl = (no: string) => `https://members.usjlps.org/verify/${no}`
 export const rankName = (k?: string | null) => RANKS.find((r) => r.key === k)?.name ?? 'Silver'
 const RANK_RGB: Record<string, [number, number, number]> = { silver: [150, 158, 168], gold: [190, 150, 60], ivy: [24, 84, 64] }
@@ -13,7 +17,7 @@ const RANK_RGB: Record<string, [number, number, number]> = { silver: [150, 158, 
 /** LinkedIn "Add licence or certification" with everything pre-filled. */
 export function linkedInAddUrl(c: CertInfo) {
   const d = new Date(c.issued_at ?? Date.now())
-  const q = new URLSearchParams({ startTask: 'CERTIFICATION_NAME', name: `${CERT_TITLE} · ${rankName(c.rank_key)} Rank`, organizationName: ORG,
+  const q = new URLSearchParams({ startTask: 'CERTIFICATION_NAME', name: `${certName(c.rank_key ?? c.level)} · ${rankName(c.rank_key ?? c.level)} Rank`, organizationName: ORG,
     issueYear: String(d.getFullYear()), issueMonth: String(d.getMonth() + 1), certUrl: verifyUrl(c.cert_no ?? ''), certId: c.cert_no ?? '' })
   return `https://www.linkedin.com/profile/add?${q.toString()}`
 }
@@ -52,24 +56,26 @@ export async function downloadCertificatePdf(c: CertInfo, memberSince: string | 
   pdf.setFont(font, 'normal'); pdf.setFontSize(8.5); pdf.setTextColor(...mute)
   pdf.text('UNIVERSITY OF SAINT JOSEPH  ·  WEST HARTFORD, CONNECTICUT', cx, 160, { align: 'center', charSpace: 1.6 })
   // Title
+  const dist = distinction(c.rank_key ?? c.level), d = dist ? 14 : 0
   pdf.setFont('times', 'normal'); pdf.setFontSize(40); pdf.setTextColor(...ink)
-  pdf.text(CERT_TITLE, cx, 206, { align: 'center' })
+  pdf.text(CERT_TITLE, cx, dist ? 200 : 206, { align: 'center' })
+  if (dist) { pdf.setFont('times', 'italic'); pdf.setFontSize(18); pdf.setTextColor(...gold); pdf.text(dist, cx, 226, { align: 'center' }) }
   pdf.setFont(font, 'normal'); pdf.setFontSize(9.5); pdf.setTextColor(...mute)
-  pdf.text('THIS CERTIFIES THAT', cx, 236, { align: 'center', charSpace: 2.4 })
+  pdf.text('THIS CERTIFIES THAT', cx, 236 + d, { align: 'center', charSpace: 2.4 })
   // Name
   pdf.setFont('times', 'bolditalic'); pdf.setTextColor(...ivy)
   let size = 44; pdf.setFontSize(size); while (pdf.getTextWidth(c.name) > 560 && size > 26) { size -= 2; pdf.setFontSize(size) }
-  pdf.text(c.name, cx, 284, { align: 'center' })
-  pdf.setDrawColor(...gold); pdf.setLineWidth(0.8); pdf.line(cx - 230, 298, cx + 230, 298)
+  pdf.text(c.name, cx, 284 + d, { align: 'center' })
+  pdf.setDrawColor(...gold); pdf.setLineWidth(0.8); pdf.line(cx - 230, 298 + d, cx + 230, 298 + d)
   // Body
-  const rank = rankName(c.rank_key)
+  const rank = rankName(c.rank_key ?? c.level)
   pdf.setFont(font, 'normal'); pdf.setFontSize(12.5); pdf.setTextColor(...ink)
   const body = `has earned the ${rank} rank of the ${ORG} through active participation in its professional development program of guest speakers, workshops and networking events, and has completed a professional résumé and a professional profile.`
   const lines = pdf.splitTextToSize(body, 540) as string[]
-  lines.forEach((l, i) => pdf.text(l, cx, 324 + i * 17, { align: 'center' }))
+  lines.forEach((l, i) => pdf.text(l, cx, 324 + d + i * 17, { align: 'center' }))
   const since = memberSince ? new Date(`${memberSince.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : null
   const stats = [c.total != null ? `${c.total} engagement stickers` : null, c.attended != null ? `${c.attended} General Meeting${c.attended === 1 ? '' : 's'} attended` : null, since ? `Member since ${since}` : null].filter(Boolean).join('   ·   ')
-  pdf.setFontSize(9.5); pdf.setTextColor(...mute); pdf.text(stats, cx, 336 + lines.length * 17 + 6, { align: 'center' })
+  pdf.setFontSize(9.5); pdf.setTextColor(...mute); pdf.text(stats, cx, 336 + d + lines.length * 17 + 6, { align: 'center' })
   // Signatures
   const sig = (x: number, img: Awaited<ReturnType<typeof signature>>, name: string | null, title: string, sub: string) => {
     const ly = 500
@@ -81,7 +87,7 @@ export async function downloadCertificatePdf(c: CertInfo, memberSince: string | 
   sig(205, sigP, c.president_name, 'President', ORG)
   sig(W - 205, sigA, c.advisor_name, c.advisor_title || 'Advisor', 'University of Saint Joseph')
   // Rank seal
-  const rc = RANK_RGB[c.rank_key ?? 'silver'] ?? RANK_RGB.silver
+  const rc = RANK_RGB[c.rank_key ?? c.level ?? 'silver'] ?? RANK_RGB.silver
   pdf.setFillColor(...rc); pdf.circle(cx, 478, 40, 'F')
   pdf.setDrawColor(...ivory); pdf.setLineWidth(1.2); pdf.circle(cx, 478, 34, 'S')
   pdf.setLineWidth(0.4); pdf.circle(cx, 478, 31, 'S')
@@ -96,6 +102,6 @@ export async function downloadCertificatePdf(c: CertInfo, memberSince: string | 
     pdf.setFillColor(255, 255, 255); pdf.rect(x0 - 3, y0 - 3, s + 6, s + 6, 'F'); pdf.setFillColor(...ink)
     for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (dark(r, k)) pdf.rect(x0 + k * m, y0 + r * m, m + 0.05, m + 0.05, 'F')
   }
-  pdf.setProperties({ title: `${c.name} · LPS ${CERT_TITLE}`, creator: 'USJ LPS Member Portal', subject: c.cert_no ?? '' })
-  saveBlob(pdf.output('blob'), `${fileSafe(c.name)} LPS Certificate.pdf`)
+  pdf.setProperties({ title: `${c.name} · LPS ${certName(c.rank_key ?? c.level)}`, creator: 'USJ LPS Member Portal', subject: c.cert_no ?? '' })
+  saveBlob(pdf.output('blob'), `${fileSafe(c.name)} LPS ${rank} Certificate.pdf`)
 }

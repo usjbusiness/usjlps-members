@@ -44,13 +44,13 @@ export function RankPage() {
         <section className="panel rank-cert">
           <div className="panel-head">
             <h2><Icon name="cert" size={20} />LPS Certificate</h2>
-            {cert.cert?.status === 'issued' ? <span className="chip chip-ok">Issued · {cert.cert.cert_no}</span>
-              : cert.cert?.status === 'requested' ? <span className="chip chip-st-requested">Requested</span>
+            {cert.cert?.status === 'requested' ? <span className="chip chip-st-requested">Requested</span>
+              : cert.cert?.status === 'issued' ? <span className="chip chip-ok">{cert.cert.level ? `${cert.cert.level[0].toUpperCase()}${cert.cert.level.slice(1)} · ` : ''}{cert.cert.cert_no}</span>
               : <span className="muted small">{[cert.checks.rank_ok, cert.checks.resume_ok, cert.checks.page_ok].filter(Boolean).length} of 3 done</span>}
           </div>
-          <p className="muted small">An official certificate signed by the President and our Advisor, with a Credential ID you can add to LinkedIn. To get it:</p>
+          <p className="muted small">An official certificate signed by the President and our Advisor, with a Credential ID you can add to LinkedIn. Silver at 6 stickers, Gold “with Distinction” at 10, Ivy “with Highest Distinction” at 15. To get it:</p>
           <CertSteps c={cert.checks} compact />
-          <Link to="/certificate" className="btn btn-gold btn-sm">{cert.cert?.status === 'issued' ? 'Download my certificate' : cert.checks.ok ? 'Request my certificate' : 'Open certificate page'}<Icon name="arrow" size={14} /></Link>
+          <Link to="/certificate" className="btn btn-gold btn-sm">{cert.checks.ok && cert.cert?.level !== cert.checks.level ? `Request my ${cert.checks.level === 'ivy' ? 'Ivy' : cert.checks.level === 'gold' ? 'Gold' : 'Silver'} certificate` : cert.cert?.status === 'issued' ? 'Download my certificate' : cert.checks.ok && !cert.cert ? 'Request my certificate' : 'Open certificate page'}<Icon name="arrow" size={14} /></Link>
         </section>
       )}
 
