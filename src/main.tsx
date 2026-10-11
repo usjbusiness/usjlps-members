@@ -21,6 +21,7 @@ import { News } from '@/pages/News'
 import { Events } from '@/pages/Events'
 import { Watch } from '@/pages/Watch'
 import { People } from '@/pages/People'
+import { PersonPage } from '@/pages/Person'
 import { RankPage } from '@/pages/Rank'
 import { ApparelPage } from '@/pages/Apparel'
 import { Propose } from '@/pages/Propose'
@@ -67,6 +68,7 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="record" element={<RecordPage />} />
                   <Route path="resume" element={<ResumePage />} />
                   <Route path="people" element={<People />} />
+                  <Route path="people/:key" element={<PersonPage />} />
                   <Route path="rank" element={<RankPage />} />
                   <Route path="apparel" element={<ApparelPage />} />
                   <Route path="propose" element={<Propose />} />

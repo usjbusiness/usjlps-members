@@ -63,7 +63,7 @@ function EduList({ items, set }: { items: Edu[]; set: (v: Edu[]) => void }) {
   ))}</>
 }
 
-function Paper({ r }: { r: Resume }) {
+export function Paper({ r }: { r: Resume }) {
   const bs = useMemo(() => blocks(r), [r])
   const ref = useRef<HTMLDivElement>(null)
   const [long, setLong] = useState(false)

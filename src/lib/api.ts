@@ -16,7 +16,7 @@ export interface Me {
 }
 export interface Post { id: string; title: string; body: string; priority: 'normal' | 'important' | 'urgent'; pinned: boolean; link_url: string | null; link_label: string | null; expires_on: string | null; author_name: string | null; author_position: string | null; created_at: string }
 export interface MemberEvent { id: string; kind: 'meeting' | 'event'; title: string; starts_at: string; ends_at: string | null; location: string | null; description: string | null; headliner: boolean; attended: boolean; status: string }
-export interface Person { person_key: string; kind: 'advisor' | 'eboard' | 'major' | 'member'; full_name: string; title: string | null; role: string | null; major: string | null; grad_year: number | null; email: string | null; avatar_url: string | null; headline: string | null; linkedin_url: string | null; interests: string[]; sort: number; is_me: boolean; last_seen_at: string | null }
+export interface Person { person_key: string; kind: 'advisor' | 'eboard' | 'major' | 'member'; full_name: string; title: string | null; role: string | null; major: string | null; grad_year: number | null; email: string | null; avatar_url: string | null; headline: string | null; linkedin_url: string | null; interests: string[]; sort: number; is_me: boolean; last_seen_at: string | null; total?: number }
 export interface Proposal { id: string; title: string; category: string; description: string; timing: string | null; can_help: boolean; status: string; response: string | null; created_at: string }
 
 async function rpc<T>(fn: string, args?: Record<string, unknown>): Promise<T> {
@@ -67,7 +67,8 @@ export const useAvatar = (path: string | null | undefined) => useQuery({
   queryKey: ['avatar', path], enabled: !!path, staleTime: 1000 * 60 * 60 * 12,
   queryFn: async () => {
     if (/^https?:\/\//.test(path!)) return path!
-    const { data, error } = await supabase.storage.from('avatars').createSignedUrl(path!, 60 * 60 * 24)
+    const media = path!.startsWith('member-media/')
+    const { data, error } = await supabase.storage.from(media ? 'member-media' : 'avatars').createSignedUrl(media ? path!.slice(13) : path!, 60 * 60 * 24)
     if (error) throw error
     return data.signedUrl
   },
@@ -160,3 +161,20 @@ export const useResume = () => useQuery({
     return (data ?? null) as Resume0 | null
   },
 })
+
+// ---- Member pages ------------------------------------------------------------
+export interface PageInfo {
+  bio: string | null; cover: string | null; avatar_path: string | null
+  instagram: string | null; x_handle: string | null; tiktok: string | null; github: string | null; website: string | null
+  show_resume: boolean; show_attendance: boolean; updated_at?: string
+}
+export interface MemberPage {
+  rows: Person[]; is_me: boolean; page: PageInfo | null; member_since: string | null; total: number
+  attendance: { attended: number; last: { title: string; starts_at: string; headliner: boolean } | null } | null
+  resume: Record<string, unknown> | null; has_resume: boolean
+}
+export const useMemberPage = (key: string) => useQuery({ queryKey: ['page', key], staleTime: 30_000, queryFn: () => rpc<MemberPage | null>('member_page', { p_key: key }) })
+export const COVERS = [
+  { key: 'ivy', label: 'Ivy' }, { key: 'gold', label: 'Gold' }, { key: 'onyx', label: 'Onyx' },
+  { key: 'navy', label: 'Navy' }, { key: 'burgundy', label: 'Burgundy' }, { key: 'dawn', label: 'Dawn' },
+] as const

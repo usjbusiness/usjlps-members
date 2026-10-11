@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/lib/auth'
 import { MAJOR_ROLE, rankOf, useMe } from '@/lib/api'
@@ -34,7 +35,7 @@ export function Profile() {
   }
   return (
     <div className="page">
-      <PageHead eyebrow="Account" title="My Profile" />
+      <PageHead eyebrow="Account" title="My Profile" actions={<Link className="btn btn-gold" to="/people/me"><Icon name="user" size={16} />View my page</Link>} />
       <div className="two">
         <section className="panel">
           <div className="prof-head"><Avatar name={name} path={me.board?.avatar_url} size={64} /><div><strong>{name}</strong><small>{m?.email ?? me.board?.email}</small></div></div>

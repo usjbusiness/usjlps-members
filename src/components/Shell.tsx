@@ -20,6 +20,7 @@ export const MORE = [
   { to: '/record', label: 'My Record', icon: 'record' },
   { to: '/resume', label: 'Résumé Builder', icon: 'resume' },
   { to: '/install', label: 'Get the App', icon: 'phone' },
+  { to: '/people/me', label: 'My Page', icon: 'edit' },
   { to: '/profile', label: 'My Profile', icon: 'user' },
 ]
 
