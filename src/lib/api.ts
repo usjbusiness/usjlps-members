@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from './supabase'
+import type { Profile } from './profile'
 
 export interface Sticker { kind: 'meeting' | 'award'; title: string; earned_on: string; value: number; headliner: boolean }
 export interface ApparelRequest { id: string; item: 'cap' | 'pin' | 'polo'; size: string | null; color: string | null; status: string; created_at: string }
@@ -166,13 +167,24 @@ export const useResume = () => useQuery({
 export interface PageInfo {
   bio: string | null; cover: string | null; avatar_path: string | null
   instagram: string | null; x_handle: string | null; tiktok: string | null; github: string | null; website: string | null
-  show_resume: boolean; show_attendance: boolean; updated_at?: string
+  show_resume: boolean; show_attendance: boolean; updated_at?: string; profile?: Profile
 }
+export interface PublicSettings { slug: string | null; is_public: boolean; public_resume: boolean; public_email: boolean; searchable: boolean; blocked: boolean; views: number }
 export interface MemberPage {
   rows: Person[]; is_me: boolean; page: PageInfo | null; member_since: string | null; total: number
   attendance: { attended: number; last: { title: string; starts_at: string; headliner: boolean } | null } | null
   resume: Record<string, unknown> | null; has_resume: boolean
+  /** Owner: full settings. Others: { slug } when the page is public. */
+  public: (Partial<PublicSettings> & { slug: string | null }) | null
 }
+export interface PublicPage {
+  slug: string; is_me: boolean; full_name: string; major: string | null; grad_year: number | null; headline: string | null; linkedin_url: string | null
+  email: string | null; avatar: string | null; is_eboard: boolean; positions: { kind: 'eboard' | 'advisor' | 'major'; title: string | null; role: string | null; major?: string | null }[]
+  member_since: string | null; total: number; attendance: MemberPage['attendance']
+  page: Omit<PageInfo, 'avatar_path' | 'show_resume' | 'show_attendance'> & { profile: Profile }
+  resume: Record<string, unknown> | null; searchable: boolean; views: number | null
+}
+export const usePublicPage = (slug: string) => useQuery({ queryKey: ['public', slug], staleTime: 60_000, refetchOnWindowFocus: false, retry: 1, queryFn: () => rpc<PublicPage | null>('public_member_page', { p_slug: slug }) })
 export const useMemberPage = (key: string) => useQuery({ queryKey: ['page', key], staleTime: 30_000, queryFn: () => rpc<MemberPage | null>('member_page', { p_key: key }) })
 /** Page headers. min = stickers needed; board = Executive Board only. Photo headers unlock at Gold. */
 export const COVERS = [

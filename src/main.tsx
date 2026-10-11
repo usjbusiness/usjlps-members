@@ -30,6 +30,7 @@ import { Profile } from '@/pages/Profile'
 import { NotesPage } from '@/pages/Notes'
 import { RecordPage } from '@/pages/Record'
 import { ResumePage } from '@/pages/Resume'
+import { PublicPage } from '@/pages/Public'
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: true } } })
 
@@ -57,28 +58,33 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <AuthProvider>
           <ToastProvider>
-            <Gate>
-              <Routes>
-                <Route element={<Shell />}>
-                  <Route index element={<Home />} />
-                  <Route path="watch" element={<Watch />} />
-                  <Route path="news" element={<News />} />
-                  <Route path="events" element={<Events />} />
-                  <Route path="notes" element={<NotesPage />} />
-                  <Route path="record" element={<RecordPage />} />
-                  <Route path="resume" element={<ResumePage />} />
-                  <Route path="people" element={<People />} />
-                  <Route path="people/:key" element={<PersonPage />} />
-                  <Route path="rank" element={<RankPage />} />
-                  <Route path="apparel" element={<ApparelPage />} />
-                  <Route path="propose" element={<Propose />} />
-                  <Route path="install" element={<Install />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="login" element={<Navigate to="/" replace />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Route>
-              </Routes>
-            </Gate>
+            <Routes>
+              <Route path="u/:slug" element={<PublicPage />} />
+              <Route path="*" element={
+                <Gate>
+                  <Routes>
+                    <Route element={<Shell />}>
+                      <Route index element={<Home />} />
+                      <Route path="watch" element={<Watch />} />
+                      <Route path="news" element={<News />} />
+                      <Route path="events" element={<Events />} />
+                      <Route path="notes" element={<NotesPage />} />
+                      <Route path="record" element={<RecordPage />} />
+                      <Route path="resume" element={<ResumePage />} />
+                      <Route path="people" element={<People />} />
+                      <Route path="people/:key" element={<PersonPage />} />
+                      <Route path="rank" element={<RankPage />} />
+                      <Route path="apparel" element={<ApparelPage />} />
+                      <Route path="propose" element={<Propose />} />
+                      <Route path="install" element={<Install />} />
+                      <Route path="profile" element={<Profile />} />
+                      <Route path="login" element={<Navigate to="/" replace />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Route>
+                  </Routes>
+                </Gate>
+              } />
+            </Routes>
           </ToastProvider>
         </AuthProvider>
       </BrowserRouter>

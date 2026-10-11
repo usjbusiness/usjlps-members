@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState, type ReactNode, type SVGProps } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode, type SVGProps } from 'react'
 import { useAvatar } from '@/lib/api'
 import { initials } from '@/lib/format'
 import { friendly } from '@/lib/supabase'
@@ -49,6 +49,18 @@ const P: Record<string, ReactNode> = {
   globe: <><circle cx="12" cy="12" r="8.5" /><path d="M3.5 12h17M12 3.5c2.4 2.4 3.5 5.3 3.5 8.5s-1.1 6.1-3.5 8.5c-2.4-2.4-3.5-5.3-3.5-8.5S9.6 5.9 12 3.5Z" /></>,
   camera: <><path d="M4 8h3.2l1.6-2.5h6.4L16.8 8H20v11H4Z" /><circle cx="12" cy="13.3" r="3.3" /></>,
   edit: <><path d="M4.5 19.5h4l10-10-4-4-10 10Z" /><path d="m13 7 4 4" /></>,
+  briefcase: <><rect x="3.5" y="7.5" width="17" height="12" rx="2" /><path d="M9 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5.5v2M3.5 12.5h17" /></>,
+  school: <><path d="M2.5 9 12 4.5 21.5 9 12 13.5Z" /><path d="M6.5 11v4.5c1.6 1.5 3.4 2.2 5.5 2.2s3.9-.7 5.5-2.2V11M21.5 9v5" /></>,
+  cert: <><circle cx="12" cy="9.5" r="5" /><path d="m9 13.8-1.5 6.7 4.5-2.2 4.5 2.2-1.5-6.7" /></>,
+  folder: <><path d="M3.5 6.5a1 1 0 0 1 1-1H10l2 2h7.5a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1Z" /></>,
+  heart: <path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z" />,
+  trophy: <><path d="M8 4.5h8v5a4 4 0 0 1-8 0Z" /><path d="M8 6.5H5a3 3 0 0 0 3 4M16 6.5h3a3 3 0 0 1-3 4M12 13.5v3M8.5 20h7l-.8-3.5h-5.4Z" /></>,
+  lang: <><path d="M4 5.5h9M8.5 3.5v2M6 5.5c.8 3.4 3 6 6 7.5M11 5.5c-.8 3.6-3.2 6.5-6.5 8" /><path d="m12.5 20.5 4-9 4 9M14 17h5" /></>,
+  sparkle: <path d="M12 3.5 13.8 10.2 20.5 12l-6.7 1.8L12 20.5l-1.8-6.7L3.5 12l6.7-1.8Z" />,
+  qr: <><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><path d="M14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 18.5V20M20 14v1.5" /></>,
+  copy: <><rect x="8.5" y="8.5" width="11" height="11" rx="2" /><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5" /></>,
+  eye: <><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="3" /></>,
+  verified: <><path d="m12 3 2.3 1.7 2.8-.2.9 2.7 2.3 1.6-.9 2.7.9 2.7-2.3 1.6-.9 2.7-2.8-.2L12 21l-2.3-1.7-2.8.2-.9-2.7-2.3-1.6.9-2.7-.9-2.7 2.3-1.6.9-2.7 2.8.2Z" /><path d="m8.8 12.2 2.2 2.2 4.3-4.6" /></>,
   board: <><rect x="3.5" y="4.5" width="17" height="12" rx="1.5" /><path d="M8 20.5l4-4 4 4M7.5 9.5h9M7.5 12.5h5" /></>,
 }
 export type IconName = keyof typeof P
@@ -132,4 +144,22 @@ export function useToast() {
   const v = useContext(ToastCtx)
   if (!v) throw new Error('useToast outside provider')
   return v
+}
+
+// ---- Modal ----------------------------------------------------------------
+export function Modal({ title, onClose, children, foot, wide }: { title: ReactNode; onClose: () => void; children: ReactNode; foot?: ReactNode; wide?: boolean }) {
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', k); const o = document.body.style.overflow; document.body.style.overflow = 'hidden'
+    return () => { document.removeEventListener('keydown', k); document.body.style.overflow = o }
+  }, [onClose])
+  return (
+    <div className="modal-wrap" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <div className={`modal${wide ? ' is-wide' : ''}`} role="dialog" aria-modal="true">
+        <div className="modal-head"><h2>{title}</h2><button className="modal-x" onClick={onClose} aria-label="Close"><Icon name="close" size={18} /></button></div>
+        <div className="modal-body">{children}</div>
+        {foot && <div className="modal-foot">{foot}</div>}
+      </div>
+    </div>
+  )
 }
