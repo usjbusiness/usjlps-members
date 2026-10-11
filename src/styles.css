@@ -941,3 +941,64 @@ dl.pp-facts { margin: 0; display: grid; gap: 4px; }
 .thumb, .thumb.has-img, .thumb.is-photo.has-img, .thumb.is-wide.has-img { background: transparent; border: 1px solid var(--line2); }
 .thumb.has-img:not(.is-photo):not(.is-wide) { padding: 6px; }
 .thumb.has-img:not(.is-photo):not(.is-wide) img { object-fit: contain; }
+
+/* ---- LPS Certificate ---- */
+.step-cert { display: flex; gap: 6px; align-items: flex-start; }
+.step-cert svg { color: var(--gold); flex: none; margin-top: 2px; }
+.step-links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.rank-cert { margin-bottom: 18px; border-color: var(--line2); }
+.rank-cert .panel-head h2 { display: flex; align-items: center; gap: 10px; }
+.rank-cert .panel-head h2 svg { color: var(--gold); }
+.rank-cert > p { margin: -6px 0 12px; }
+.csteps { list-style: none; display: grid; gap: 10px; margin: 0 0 18px; padding: 0; }
+.csteps li { display: grid; grid-template-columns: 30px 1fr auto; gap: 12px; align-items: start; padding: 13px 14px; border: 1px solid var(--hair); border-radius: 14px; background: rgba(255, 255, 255, .02); }
+.csteps li.is-ok { border-color: rgba(88, 185, 135, .35); background: rgba(88, 185, 135, .05); }
+.csteps strong { display: block; font-weight: 600; font-size: 14.5px; margin: 4px 0 3px; }
+.csteps ul { margin: 4px 0 0 16px; padding: 0; }
+.csteps li li, .csteps.is-compact li li { display: list-item; padding: 0; margin: 2px 0 0; border: 0; border-radius: 0; background: none; }
+.csteps .more { margin-top: 6px; white-space: nowrap; }
+.cstep-n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 600 13px/1 var(--sans); color: var(--gold2); border: 1px solid var(--line2); background: rgba(201, 165, 76, .08); }
+.is-ok .cstep-n { color: #0A0A0A; background: #58B987; border-color: #58B987; }
+.csteps.is-compact li { padding: 11px 12px; }
+.cert-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+.cert-side h2 { font-size: 26px; margin: 12px 0 6px; }
+.cert-h { margin-top: 12px; }
+.cert-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 12px; }
+.cert-note { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; margin: 0 0 14px; font-size: 13px; color: #FF9C93; background: rgba(224, 86, 75, .1); border: 1px solid rgba(224, 86, 75, .35); }
+.cert-note svg { flex: none; margin-top: 2px; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .02em; }
+.cert-card { aspect-ratio: 11 / 8.5; background: #FBF8F1; border: 7px solid #123F31; border-radius: 6px; padding: 9px; box-shadow: 0 24px 60px rgba(0, 0, 0, .45); color: #1C1C1C; container-type: inline-size; }
+.cert-in { height: 100%; border: 1.5px solid #B08C3A; outline: .5px solid #B08C3A; outline-offset: -5px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 3.5cqw 7cqw 2.5cqw; }
+.cert-crest { width: 9cqw; height: auto; filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .15)); }
+.cert-org { font: 600 1.45cqw/1 var(--sans); letter-spacing: .3em; text-transform: uppercase; color: #B08C3A; margin: 1.6cqw 0 0; }
+.cert-card h3 { font: 400 5.2cqw/1 'Times New Roman', Times, serif; color: #1C1C1C; margin: 2.6cqw 0 0; }
+.cert-small { font: 500 1.25cqw/1 var(--sans); letter-spacing: .28em; text-transform: uppercase; color: #706C64; margin: 2.4cqw 0 0; }
+.cert-name { font: italic 700 5.6cqw/1.1 'Times New Roman', Times, serif; color: #123F31; margin: 1.8cqw 0 0; padding: 0 4cqw .8cqw; border-bottom: 1px solid #B08C3A; min-width: 58%; }
+.cert-body { font-size: 1.7cqw; line-height: 1.5; color: #333; margin: 2cqw 0 0; max-width: 72cqw; }
+.cert-sigs { margin-top: auto; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+.cert-sigs span { width: 28%; border-top: 1px solid #1C1C1C; padding-top: .8cqw; font: 600 1.35cqw/1 var(--sans); color: #706C64; letter-spacing: .1em; text-transform: uppercase; }
+.cert-seal { width: 10cqw; height: 10cqw; border-radius: 50%; display: grid; place-items: center; font: normal 700 1.5cqw/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: #fff; background: #969EA8; box-shadow: inset 0 0 0 .6cqw #969EA8, inset 0 0 0 .8cqw #FBF8F1; }
+.cert-seal.r-gold { background: #BE963C; box-shadow: inset 0 0 0 .6cqw #BE963C, inset 0 0 0 .8cqw #FBF8F1; }
+.cert-seal.r-ivy { background: #185440; box-shadow: inset 0 0 0 .6cqw #185440, inset 0 0 0 .8cqw #FBF8F1; }
+.cert-id { font-size: 1.25cqw; color: #706C64; margin: 1.6cqw 0 0; }
+.vfy { max-width: 720px; margin: 0 auto; padding-top: 40px; padding-bottom: 60px; }
+.vfy h1 { font-size: clamp(32px, 6vw, 46px); margin: 6px 0 18px; }
+.vfy-form { display: flex; gap: 10px; margin-bottom: 22px; }
+.vfy-form input { flex: 1; min-width: 0; background: rgba(255, 255, 255, .035); border: 1px solid rgba(243, 237, 226, .16); border-radius: 12px; padding: 12px 14px; font-size: 15.5px; color: var(--ivory); outline: none; text-transform: uppercase; }
+.vfy-form input::placeholder { text-transform: none; color: rgba(243, 237, 226, .32); }
+.vfy-form input:focus { border-color: var(--gold); }
+.vfy-card { display: flex; gap: 18px; align-items: flex-start; padding: 22px; border-radius: var(--r); border: 1px solid var(--line); background: var(--card); }
+.vfy-card h2 { font-size: 30px; margin: 10px 0 4px; }
+.vfy-card.is-ok { border-color: rgba(88, 185, 135, .45); background: linear-gradient(180deg, rgba(88, 185, 135, .08), rgba(88, 185, 135, .02)); }
+.vfy-card.is-bad > svg { color: #FF9C93; flex: none; margin-top: 6px; }
+.vfy-card.is-bad h2 { margin-top: 0; }
+.vfy-dl { display: flex; flex-wrap: wrap; gap: 14px 30px; margin: 14px 0 0; }
+.vfy-dl dt { font: 600 10.5px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--mute); margin-bottom: 5px; }
+.vfy-dl dd { margin: 0; }
+.vfy-about { margin-top: 26px; }
+@media (max-width: 900px) { .cert-grid { grid-template-columns: 1fr; } }
+@media (max-width: 560px) {
+  .csteps li { grid-template-columns: 30px 1fr; }
+  .csteps li > .more { grid-column: 2; margin-top: -4px; }
+  .vfy-card { flex-direction: column; }
+}

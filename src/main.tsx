@@ -31,6 +31,8 @@ import { NotesPage } from '@/pages/Notes'
 import { RecordPage } from '@/pages/Record'
 import { ResumePage } from '@/pages/Resume'
 import { PublicPage } from '@/pages/Public'
+import { CertificatePage } from '@/pages/Certificate'
+import { VerifyPage } from '@/pages/Verify'
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: true } } })
 
@@ -60,6 +62,8 @@ createRoot(document.getElementById('root')!).render(
           <ToastProvider>
             <Routes>
               <Route path="u/:slug" element={<PublicPage />} />
+              <Route path="verify" element={<VerifyPage />} />
+              <Route path="verify/:no" element={<VerifyPage />} />
               <Route path="*" element={
                 <Gate>
                   <Routes>
@@ -74,6 +78,7 @@ createRoot(document.getElementById('root')!).render(
                       <Route path="people" element={<People />} />
                       <Route path="people/:key" element={<PersonPage />} />
                       <Route path="rank" element={<RankPage />} />
+                      <Route path="certificate" element={<CertificatePage />} />
                       <Route path="apparel" element={<ApparelPage />} />
                       <Route path="propose" element={<Propose />} />
                       <Route path="install" element={<Install />} />

@@ -18,7 +18,7 @@ function setMeta(name: string, content: string | null) {
   el.content = content
 }
 
-function TopBar() {
+export function TopBar() {
   const { status } = useAuth()
   return (
     <header className="pub-top">
@@ -28,7 +28,7 @@ function TopBar() {
   )
 }
 
-function Foot() {
+export function Foot() {
   return (
     <footer className="pub-foot">
       <img src="/img/mono-gold.webp" alt="" />

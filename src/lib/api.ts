@@ -79,7 +79,7 @@ export const useAvatar = (path: string | null | undefined) => useQuery({
 export const RANKS = [
   { key: 'member', name: 'Member', min: 0, perk: 'Every event, the member portal, the library and the GroupMe chat.' },
   { key: 'bronze', name: 'Bronze', min: 3, perk: 'The LPS lapel pin and an LPS sticker, requested right here in the portal. Bronze page headers.' },
-  { key: 'silver', name: 'Silver', min: 6, perk: 'The LPS polo and a signed LPS certificate for your résumé and LinkedIn. Silver page headers.' },
+  { key: 'silver', name: 'Silver', min: 6, perk: 'The LPS polo and a signed LPS certificate for your résumé and LinkedIn (it also needs a finished résumé and a public LPS page or LinkedIn). Silver page headers.' },
   { key: 'gold', name: 'Gold', min: 10, perk: 'Priority seats and meet-and-greets with headline guests. The Gold header and your own header photo.' },
   { key: 'ivy', name: 'Ivy', min: 15, perk: 'Company trips, an e-board reference and the chance to co-host. The green Ivy headers.' },
 ] as const
@@ -209,3 +209,20 @@ export function coverLock(key: string, total: number, exec: boolean): string | n
 }
 /** Header shown until someone picks one: their rank's colour, or Executive for the e-board. */
 export const defaultCover = (total: number, exec: boolean) => exec ? 'executive' : ({ member: 'onyx', bronze: 'bronze', silver: 'silver', gold: 'gold', ivy: 'ivy' } as const)[rankOf(total).rank.key]
+
+// ---- LPS Certificate -------------------------------------------------------
+export const CERT_MIN = 6
+export interface CertChecks { total: number; need: number; rank_ok: boolean; resume_ok: boolean; resume_missing: string[]; page_ok: boolean; page_kind: 'public' | 'linkedin' | null; slug: string | null; linkedin: string | null; ok: boolean }
+export interface CertInfo {
+  status: 'requested' | 'issued' | 'declined'; cert_no: string | null; name: string; rank_key: string | null; total: number | null; attended: number | null
+  requested_at: string; issued_at: string | null; note: string | null; president_name: string | null; advisor_name: string | null; advisor_title: string | null
+  president_sig: string | null; advisor_sig: string | null
+}
+export interface MyCertificate { checks: CertChecks; full_name: string; member_since: string | null; cert: CertInfo | null }
+export const useCertificate = () => useQuery({ queryKey: ['certificate'], staleTime: 30_000, queryFn: () => rpc<MyCertificate | null>('member_certificate') })
+export interface CertVerify { cert_no: string; valid: boolean; name: string; rank_key: string | null; issued_at: string | null; president_name: string | null; advisor_name: string | null; advisor_title: string | null }
+export const useVerifyCertificate = (no: string) => useQuery({ queryKey: ['verify', no], enabled: !!no, retry: 1, refetchOnWindowFocus: false, queryFn: () => rpc<CertVerify | null>('verify_certificate', { p_no: no }) })
+export const RESUME_MISSING: Record<string, string> = {
+  resume: 'Start your résumé in the Résumé Builder', name: 'Your name', contact: 'Your email and phone number',
+  education: 'Education with your school and degree', experience: 'At least one experience or leadership role with bullet points', skills: 'Skills or languages',
+}

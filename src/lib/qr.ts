@@ -4,7 +4,7 @@ import { saveBlob } from './doc'
 export const PUBLIC_BASE = 'https://members.usjlps.org/u/'
 export const publicUrl = (slug: string) => `${PUBLIC_BASE}${slug}`
 
-function matrix(text: string) {
+export function matrix(text: string) {
   const q = qrcode(0, 'H'); q.addData(text); q.make()
   const n = q.getModuleCount()
   return { n, dark: (r: number, c: number) => q.isDark(r, c) }

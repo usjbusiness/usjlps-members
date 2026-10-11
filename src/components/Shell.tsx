@@ -15,6 +15,7 @@ export const MORE = [
   { to: '/events', label: 'Events', icon: 'calendar' },
   { to: '/notes', label: 'My Notes', icon: 'note' },
   { to: '/rank', label: 'Rank & Stickers', icon: 'medal' },
+  { to: '/certificate', label: 'LPS Certificate', icon: 'cert' },
   { to: '/apparel', label: 'LPS Merch', icon: 'shirt' },
   { to: '/propose', label: 'Propose an Event', icon: 'bulb' },
   { to: '/record', label: 'My Record', icon: 'record' },

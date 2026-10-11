@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
-import { RANKS, rankOf, useMe } from '@/lib/api'
+import { RANKS, rankOf, useCertificate, useMe } from '@/lib/api'
+import { CertSteps } from './Certificate'
 import { fmtDate } from '@/lib/format'
 import { Icon, Medal, PageHead } from '@/components/ui'
 
 export function RankPage() {
   const me = useMe().data!
   const r = rankOf(me.total)
+  const cert = useCertificate().data
   const target = r.next?.min ?? me.total
   const placeholders = Math.max(0, target - me.stickers.reduce((s, x) => s + x.value, 0))
   return (
@@ -31,12 +33,26 @@ export function RankPage() {
               <Medal rank={x.key} size={46} locked={!done} />
               <div><strong>{x.name}{cur && <em className="you">You</em>}</strong><small>{x.min === 0 ? 'Approved application' : `${x.min} stickers`}</small><p>{x.perk}</p>
                 {x.key === 'bronze' && done && <Link to="/apparel" className="more">Request your pin<Icon name="arrow" size={13} /></Link>}
-                {x.key === 'silver' && done && <Link to="/apparel" className="more">Request your polo<Icon name="arrow" size={13} /></Link>}</div>
+                {x.key === 'silver' && done && <span className="step-links"><Link to="/apparel" className="more">Request your polo<Icon name="arrow" size={13} /></Link><Link to="/certificate" className="more">Get your certificate<Icon name="arrow" size={13} /></Link></span>}</div>
               {done ? <Icon name="check" size={18} className="step-ic" /> : <Icon name="lock" size={16} className="step-ic" />}
             </div>
           )
         })}
       </section>
+
+      {cert && (
+        <section className="panel rank-cert">
+          <div className="panel-head">
+            <h2><Icon name="cert" size={20} />LPS Certificate</h2>
+            {cert.cert?.status === 'issued' ? <span className="chip chip-ok">Issued · {cert.cert.cert_no}</span>
+              : cert.cert?.status === 'requested' ? <span className="chip chip-st-requested">Requested</span>
+              : <span className="muted small">{[cert.checks.rank_ok, cert.checks.resume_ok, cert.checks.page_ok].filter(Boolean).length} of 3 done</span>}
+          </div>
+          <p className="muted small">An official certificate signed by the President and our Advisor, with a Credential ID you can add to LinkedIn. To get it:</p>
+          <CertSteps c={cert.checks} compact />
+          <Link to="/certificate" className="btn btn-gold btn-sm">{cert.cert?.status === 'issued' ? 'Download my certificate' : cert.checks.ok ? 'Request my certificate' : 'Open certificate page'}<Icon name="arrow" size={14} /></Link>
+        </section>
+      )}
 
       <section className="panel">
         <div className="panel-head"><h2>My stickers</h2><span className="muted small">{me.stickers.length} event{me.stickers.length === 1 ? '' : 's'}</span></div>
