@@ -17,7 +17,7 @@ export interface Me {
 }
 export interface Post { id: string; title: string; body: string; priority: 'normal' | 'important' | 'urgent'; pinned: boolean; link_url: string | null; link_label: string | null; expires_on: string | null; author_name: string | null; author_position: string | null; created_at: string }
 export interface MemberEvent { id: string; kind: 'meeting' | 'event'; title: string; starts_at: string; ends_at: string | null; location: string | null; description: string | null; headliner: boolean; attended: boolean; status: string }
-export interface Person { person_key: string; kind: 'advisor' | 'eboard' | 'major' | 'member'; full_name: string; title: string | null; role: string | null; major: string | null; grad_year: number | null; email: string | null; avatar_url: string | null; headline: string | null; linkedin_url: string | null; interests: string[]; sort: number; is_me: boolean; last_seen_at: string | null; total?: number }
+export interface Person { person_key: string; kind: 'advisor' | 'eboard' | 'major' | 'member'; full_name: string; title: string | null; role: string | null; major: string | null; grad_year: number | null; email: string | null; avatar_url: string | null; headline: string | null; linkedin_url: string | null; interests: string[]; sort: number; is_me: boolean; last_seen_at: string | null; total?: number; activity?: 'seen' | 'never' | 'hidden' | null }
 export interface Proposal { id: string; title: string; category: string; description: string; timing: string | null; can_help: boolean; status: string; response: string | null; created_at: string }
 
 export interface Poll { id: string; question: string; details: string | null; multi: boolean; options: string[]; allow_other: boolean; closes_at: string | null;

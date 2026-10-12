@@ -1083,3 +1083,26 @@ dl.pp-facts { margin: 0; display: grid; gap: 4px; }
 .poll-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); margin-bottom: 26px; }
 .sec-title { font-family: var(--serif); font-size: 22px; font-weight: 500; margin: 8px 0 12px; color: var(--ivory); }
 .interests { display: grid; gap: 12px; justify-items: start; margin-top: 8px; }
+
+/* Advisors & Executive Board: centered leader cards with a role-colored top line */
+.people-grid.is-lead { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.person.is-lead { position: relative; overflow: hidden; flex-direction: column; align-items: stretch; padding: 26px 18px 20px; text-align: center;
+  background: radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--rc, #C9A54C) 16%, transparent), transparent 70%), var(--card); border-color: var(--line); }
+.person.is-lead::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--rc, #C9A54C), transparent); }
+.person.is-lead:hover { border-color: color-mix(in srgb, var(--rc, #C9A54C) 55%, transparent); transform: translateY(-2px); }
+.person.is-lead { transition: border-color .2s, transform .2s; }
+.person.is-lead .person-open { flex-direction: column; align-items: center; gap: 14px; }
+.person.is-lead .person-main > strong { font-size: 21px; margin-bottom: 8px; }
+.person.is-lead .badges, .person.is-lead .rank-row, .person.is-lead .seen { justify-content: center; }
+.person.is-lead .person-head { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.person.is-lead .person-links { position: absolute; top: 12px; right: 12px; flex-direction: row; }
+.person.is-lead .person-links a { width: 30px; height: 30px; }
+.person.is-lead.is-me { border-color: var(--gold); }
+.seen.is-none { color: rgba(243, 237, 226, .38); }
+.seen.is-none i { background: transparent; border: 1px solid rgba(243, 237, 226, .3); }
+@media (max-width: 620px) {
+  .people-grid.is-lead { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .person.is-lead { padding: 20px 10px 14px; }
+  .person.is-lead .person-main > strong { font-size: 17px; }
+  .person.is-lead .person-head { display: none; }
+}
