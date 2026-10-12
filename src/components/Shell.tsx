@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth'
 import { rankOf, useLiveNow, useMe } from '@/lib/api'
 import { supabase } from '@/lib/supabase'
 import { Avatar, Icon, Medal } from './ui'
+import { Tour, startTour } from './Tour'
 
 export const MAIN = [
   { to: '/', label: 'Home', icon: 'home', end: true },
@@ -55,12 +56,13 @@ export function Shell() {
       <aside className="side">
         <Link to="/" className="side-brand"><img src="/img/mono-gold.webp" alt="" /><span><strong>USJ LPS</strong><small>Member Portal</small></span></Link>
         <nav className="side-nav">
-          {MAIN.map((n) => <NavLink key={n.to} to={n.to} end={n.end}><Icon name={n.icon} />{n.label}{n.to === '/watch' && live?.live && <b className="live-dot" title="Live now" />}</NavLink>)}
+          {MAIN.map((n) => <NavLink key={n.to} to={n.to} end={n.end} data-tour={n.to}><Icon name={n.icon} />{n.label}{n.to === '/watch' && live?.live && <b className="live-dot" title="Live now" />}</NavLink>)}
           <p className="side-sec">Society</p>
-          {MORE.slice(0, 5).map((n) => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          {MORE.slice(0, 5).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           <p className="side-sec">You</p>
-          {MORE.slice(5).map((n) => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          {MORE.slice(5).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           {groupme && <a href={groupme} target="_blank" rel="noopener noreferrer"><Icon name="chat" />GroupMe Chat<Icon name="ext" size={13} className="ext" /></a>}
+          <button type="button" className="side-tour" onClick={startTour}><Icon name="sparkle" />Portal tour</button>
         </nav>
         <Link to="/profile" className="side-me">
           <Avatar name={name} path={me?.board?.avatar_url} size={38} />
@@ -77,18 +79,21 @@ export function Shell() {
       <main className="main"><Outlet /></main>
 
       <nav className="tabs" aria-label="Main">
-        {MAIN.map((n) => <NavLink key={n.to} to={n.to} end={n.end}><span className="tab-ic"><Icon name={n.icon} size={22} />{n.to === '/watch' && live?.live && <b className="live-dot" />}</span>{n.short ?? n.label}</NavLink>)}
+        {MAIN.map((n) => <NavLink key={n.to} to={n.to} end={n.end} data-tour={n.to}><span className="tab-ic"><Icon name={n.icon} size={22} />{n.to === '/watch' && live?.live && <b className="live-dot" />}</span>{n.short ?? n.label}</NavLink>)}
         <button className={moreActive || sheet ? 'active' : ''} onClick={() => setSheet(true)}><span className="tab-ic"><Icon name="more" size={22} /></span>More</button>
       </nav>
+
+      {me && <Tour userId={me.member?.id ?? me.board?.id ?? 'me'} firstName={name.split(' ')[0]} setSheet={setSheet} />}
 
       {sheet && (
         <div className="sheet-wrap" onClick={() => setSheet(false)}>
           <div className="sheet" role="dialog" aria-label="More" onClick={(e) => e.stopPropagation()}>
             <span className="sheet-grip" />
             <div className="sheet-grid">
-              {MORE.map((n) => <NavLink key={n.to} to={n.to}><Icon name={n.icon} size={22} /><span>{n.label}</span></NavLink>)}
+              {MORE.map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} size={22} /><span>{n.label}</span></NavLink>)}
               {groupme && <a href={groupme} target="_blank" rel="noopener noreferrer"><Icon name="chat" size={22} /><span>GroupMe Chat</span></a>}
               <a href="https://www.instagram.com/usjlps" target="_blank" rel="noopener noreferrer"><Icon name="insta" size={22} /><span>@usjlps</span></a>
+              <button type="button" onClick={() => { setSheet(false); window.setTimeout(startTour, 250) }}><Icon name="sparkle" size={22} /><span>Portal tour</span></button>
             </div>
             <button className="btn btn-ghost btn-block" onClick={() => signOut()}><Icon name="out" size={18} />Sign out</button>
           </div>
