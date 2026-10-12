@@ -67,9 +67,9 @@ export function Paper({ r }: { r: Resume }) {
   const bs = useMemo(() => blocks(r), [r])
   const ref = useRef<HTMLDivElement>(null)
   const [long, setLong] = useState(false)
-  useEffect(() => { const el = ref.current; if (el) setLong(el.scrollHeight > el.clientWidth * (11 / 8.5) + 2) }, [bs])
+  useEffect(() => { const el = ref.current; if (el) setLong(el.scrollHeight > el.clientWidth * (11 / 8.5) * 2 + 2) }, [bs])
   return (
-    <div className="paper-wrap">{long && <p className="paper-warn"><Icon name="clock" size={14} />Longer than one page. Try shortening bullets: one page is the USJ standard.</p>}<div className="paper" ref={ref}>
+    <div className="paper-wrap">{long && <p className="paper-warn"><Icon name="clock" size={14} />Longer than two pages. Try shortening some bullets — one or two pages is best.</p>}<div className="paper" ref={ref}>
       {!bs.length && <p className="paper-empty">Your résumé preview appears here.</p>}
       {bs.map((b, i) => {
         const runs = (rs: { text: string; b?: boolean; i?: boolean }[]) => rs.map((x, j) => <span key={j} style={{ fontWeight: x.b ? 700 : 400, fontStyle: x.i ? 'italic' : 'normal' }}>{x.text}</span>)
@@ -218,7 +218,7 @@ export function ResumePage() {
           <section className="rsec rtips">
             <h2>Tips from the Career Center format</h2>
             <ul>
-              <li>Keep it to one page. Most recent first in every section.</li>
+              <li>One or two pages. Most recent first in every section.</li>
               <li>Start each bullet with a strong action verb and show the result (numbers help).</li>
               <li>Download the Word file if you want to adjust spacing, then save as PDF to send.</li>
             </ul>
