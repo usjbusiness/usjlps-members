@@ -5,6 +5,7 @@ import { friendly } from '@/lib/supabase'
 
 // ---- Icons (1.6px line icons) ------------------------------------------
 const P: Record<string, ReactNode> = {
+  poll: <><path d="M4 20h16" /><rect x="5" y="11" width="3.2" height="6.5" rx="1" /><rect x="10.4" y="5" width="3.2" height="12.5" rx="1" /><rect x="15.8" y="8.5" width="3.2" height="9" rx="1" /></>,
   home: <><path d="M3.5 10.5 12 4l8.5 6.5" /><path d="M5.5 9.5V20h13V9.5" /><path d="M10 20v-5.5h4V20" /></>,
   live: <><rect x="2.5" y="5" width="19" height="12.5" rx="2" /><path d="M8 21h8M12 17.5V21" /><circle cx="12" cy="11.2" r="2.3" fill="currentColor" stroke="none" /></>,
   news: <><path d="M4 9.5v5l3 .5 9 4.5V4.5L7 9 4 9.5Z" /><path d="M7 15l1.2 5" /><path d="M19 9.5a3 3 0 0 1 0 5" /></>,

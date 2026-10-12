@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
-import { isOnline, rankOf, useDirectory, useEvents, useLiveNow, useMe, usePosts, type Me } from '@/lib/api'
+import { isOnline, rankOf, useDirectory, useEvents, useLiveNow, useMe, usePolls, usePosts, type Me } from '@/lib/api'
 import { fmtDate, fmtTime, fmtWhen, firstName, greeting } from '@/lib/format'
 import { Avatar, Icon, Medal } from '@/components/ui'
 import { Net } from '@/components/Net'
+import { InterestsPicker, PollCard } from '@/components/Polls'
 import { seenPosts } from './News'
 
 export function MemberCard({ me }: { me: Me }) {
@@ -24,6 +25,27 @@ export function MemberCard({ me }: { me: Me }) {
         <div><small>Member since</small><b>{since ? fmtDate(since, { month: 'short', year: 'numeric' }) : 'Founding'}</b></div>
         <div><small>Rank</small><b className="mcard-rank"><Medal rank={r.rank.key} size={13} />{r.rank.name}</b></div>
       </div>
+    </div>
+  )
+}
+
+function HomePolls({ me }: { me: Me }) {
+  const polls = usePolls().data ?? []
+  const todo = polls.filter((p) => p.is_open && !(p.my_choices?.length || p.my_other))
+  const show = todo[0] ?? polls.find((p) => p.is_open)
+  const needInterests = !!me.member && !(me.member.interests?.length)
+  if (!show && !needInterests) return null
+  return (
+    <div className="home-grid home-voice">
+      {show && <section className="panel span2 pollpanel">
+        <div className="panel-head"><h2>{todo.length ? 'Quick poll' : 'Latest poll'}</h2><Link to="/polls" className="more">{todo.length > 1 ? `${todo.length - 1} more` : 'All polls'}<Icon name="arrow" size={14} /></Link></div>
+        <PollCard key={show.id} poll={show} compact />
+      </section>}
+      {needInterests && <section className="panel span2">
+        <div className="panel-head"><h2>What interests you?</h2></div>
+        <p className="muted small">Pick everything you want from LPS. The e-board plans sessions and guests around what members choose.</p>
+        <InterestsPicker value={[]} />
+      </section>}
     </div>
   )
 }
@@ -69,6 +91,8 @@ export function Home() {
           <Icon name="arrow" size={16} />
         </Link>
       )}
+
+      <HomePolls me={me} />
 
       <div className="home-grid">
         <section className="panel rankpanel">

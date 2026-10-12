@@ -20,6 +20,12 @@ export interface MemberEvent { id: string; kind: 'meeting' | 'event'; title: str
 export interface Person { person_key: string; kind: 'advisor' | 'eboard' | 'major' | 'member'; full_name: string; title: string | null; role: string | null; major: string | null; grad_year: number | null; email: string | null; avatar_url: string | null; headline: string | null; linkedin_url: string | null; interests: string[]; sort: number; is_me: boolean; last_seen_at: string | null; total?: number }
 export interface Proposal { id: string; title: string; category: string; description: string; timing: string | null; can_help: boolean; status: string; response: string | null; created_at: string }
 
+export interface Poll { id: string; question: string; details: string | null; multi: boolean; options: string[]; allow_other: boolean; closes_at: string | null;
+  created_at: string; is_open: boolean; my_choices: number[] | null; my_other: string | null; counts: number[] | null; voters: number }
+// Same list as the Join page (usjlps.org/join), so e-board statistics stay comparable.
+export const INTERESTS = ['Leadership', 'Public Speaking', 'Networking', 'Career Readiness', 'Simulations', 'Entrepreneurship', 'Healthcare',
+  'Business & Finance', 'Tech & Data', 'Media & Marketing', 'Education', 'Community Impact']
+
 async function rpc<T>(fn: string, args?: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.rpc(fn, args)
   if (error) throw error
@@ -228,3 +234,5 @@ export const RESUME_MISSING: Record<string, string> = {
   resume: 'Start your résumé in the Résumé Builder', name: 'Your name', contact: 'Your email and phone number',
   education: 'Education with your school and degree', experience: 'At least one experience or leadership role with bullet points', skills: 'Skills or languages',
 }
+
+export const usePolls = () => useQuery({ queryKey: ['polls'], staleTime: 20_000, refetchInterval: 30_000, queryFn: () => rpc<Poll[]>('member_polls_list') })

@@ -27,6 +27,7 @@ import { ApparelPage } from '@/pages/Apparel'
 import { Propose } from '@/pages/Propose'
 import { Install } from '@/pages/Install'
 import { Profile } from '@/pages/Profile'
+import { PollsPage } from '@/pages/Polls'
 import { NotesPage } from '@/pages/Notes'
 import { RecordPage } from '@/pages/Record'
 import { ResumePage } from '@/pages/Resume'
@@ -83,6 +84,7 @@ createRoot(document.getElementById('root')!).render(
                       <Route path="propose" element={<Propose />} />
                       <Route path="install" element={<Install />} />
                       <Route path="profile" element={<Profile />} />
+                      <Route path="polls" element={<PollsPage />} />
                       <Route path="login" element={<Navigate to="/" replace />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Route>

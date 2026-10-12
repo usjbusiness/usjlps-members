@@ -7,6 +7,7 @@ import { fmtDate } from '@/lib/format'
 import { remember, supabase } from '@/lib/supabase'
 import { Avatar, Icon, Medal, PageHead, useToast } from '@/components/ui'
 import { MemberCard } from './Home'
+import { InterestsPicker } from '@/components/Polls'
 
 export function Profile() {
   const me = useMe().data!
@@ -46,7 +47,6 @@ export function Profile() {
             <dt>Class of</dt><dd>{m?.grad_year ?? me.board?.grad_year ?? '—'}</dd>
             {m && <><dt>Member since</dt><dd>{fmtDate(m.date_joined)}</dd></>}
             <dt>Rank</dt><dd className="mcard-rank"><Medal rank={r.rank.key} size={14} />{r.rank.name} · {me.total} stickers</dd>
-            {m?.interests?.length ? <><dt>Interests</dt><dd>{m.interests.join(', ')}</dd></> : null}
           </dl>
           <p className="muted small">Need to change your name, major or email? Ask the Secretary.</p>
           <MemberCard me={me} />
@@ -61,6 +61,11 @@ export function Profile() {
             <button className="btn btn-gold" disabled={busy} onClick={save}>{busy ? 'Saving…' : 'Save'}</button>
           </> : <p className="muted small">Your e-board profile (photo, title) is managed in the E-Board Portal.</p>}
           <label className="toggle"><input type="checkbox" checked={showOn} onChange={(e) => void setActivity(e.target.checked)} /><span className="tg" /><span><strong>Show when I'm online</strong><small>A green dot and “Active 2 h ago” next to your name. Turn off to stay invisible.</small></span></label>
+          {m && <>
+            <div className="panel-head sep" id="interests"><h2>My interests</h2></div>
+            <p className="muted small">Pick what you want from LPS. The e-board plans sessions, workshops and guests around these.</p>
+            <InterestsPicker key={(m.interests ?? []).join('|')} value={m.interests ?? []} />
+          </>}
           <div className="panel-head sep"><h2>This device</h2></div>
           <label className="toggle"><input type="checkbox" checked={keep} onChange={(e) => { setKeep(e.target.checked); remember.set(e.target.checked) }} /><span className="tg" /><span><strong>Keep me signed in</strong><small>Turn off on shared computers. You will be signed out when the browser closes.</small></span></label>
           {me.board && <a className="btn btn-ghost btn-block" href="https://eboard.usjlps.org" target="_blank" rel="noopener noreferrer"><Icon name="board" size={16} />Open the E-Board Portal<Icon name="ext" size={13} /></a>}
