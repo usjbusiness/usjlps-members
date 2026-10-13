@@ -1,3 +1,4 @@
+import { EventStatus } from '@/components/EventStatus'
 import { Link } from 'react-router-dom'
 import { isOnline, rankOf, useDirectory, useEvents, useLiveNow, useMe, usePolls, usePosts, type Me } from '@/lib/api'
 import { fmtDate, fmtTime, fmtWhen, firstName, greeting } from '@/lib/format'
@@ -58,7 +59,7 @@ export function Home() {
   const r = rankOf(me.total)
   const name = me.member?.full_name ?? me.board?.full_name ?? ''
   const now = Date.now()
-  const upcoming = events.filter((e) => new Date(e.starts_at).getTime() > now - 3 * 3600e3).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 3)
+  const upcoming = events.filter((e) => new Date(e.starts_at).getTime() > now - 3 * 3600e3 && !['cancelled','completed'].includes(e.status)).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 3)
   const seen = seenPosts()
   const groupme = me.settings?.groupme_url
   const people = useDirectory().data ?? []
@@ -114,8 +115,8 @@ export function Home() {
           {upcoming.length ? <ul className="mini-events">{upcoming.map((e) => (
             <li key={`${e.kind}-${e.id}`}>
               <span className="datetile"><small>{fmtDate(e.starts_at, { month: 'short' })}</small><b>{fmtDate(e.starts_at, { day: 'numeric' })}</b></span>
-              <span><strong>{e.title}</strong><small>{fmtTime(e.starts_at)}{e.location ? ` · ${e.location}` : ''}</small></span>
-              {e.headliner && <span className="chip chip-gold">×2</span>}
+              <span className="mini-event-copy"><strong>{e.title}</strong><small>{fmtTime(e.starts_at)}{e.location ? ` · ${e.location}` : ''}</small></span>
+              <span className="mini-event-statuses"><EventStatus status={e.status}/>{e.headliner && <span className="chip chip-gold">×2</span>}</span>
             </li>
           ))}</ul> : <p className="muted small pad">No events scheduled yet. The e-board will post the next one soon.</p>}
         </section>

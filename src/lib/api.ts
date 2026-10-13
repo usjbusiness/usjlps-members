@@ -42,7 +42,7 @@ export const usePosts = () => useQuery({
     return (data ?? []) as Post[]
   },
 })
-export const useEvents = () => useQuery({ queryKey: ['events'], staleTime: 120_000, queryFn: () => rpc<MemberEvent[]>('member_events') })
+export const useEvents = () => useQuery({ queryKey: ['events'], staleTime: 30_000, refetchInterval: 30_000, refetchOnWindowFocus: true, queryFn: () => rpc<MemberEvent[]>('member_events') })
 export const useDirectory = () => useQuery({ queryKey: ['directory'], staleTime: 60_000, refetchInterval: 120_000, queryFn: () => rpc<Person[]>('member_directory') })
 export const useProposals = () => useQuery({
   queryKey: ['proposals'],

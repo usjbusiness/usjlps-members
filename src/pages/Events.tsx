@@ -1,3 +1,4 @@
+import { EventStatus } from '@/components/EventStatus'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useEvents, useNotes, type MemberEvent } from '@/lib/api'
@@ -13,14 +14,13 @@ function EventCard({ e, past, hasNote }: { e: MemberEvent; past?: boolean; hasNo
         <div className="post-tags">
           <span className="chip">{e.kind === 'meeting' ? 'General Meeting' : 'Event'}</span>
           {e.headliner && <span className="chip chip-gold"><Icon name="star" size={12} />Headliner · counts double</span>}
-          {e.status === 'postponed' && <span className="chip chip-important">Postponed</span>}
           {past && e.attended && <span className="chip chip-ok"><Icon name="check" size={12} />Sticker earned</span>}
         </div>
-        <h3>{e.title}</h3>
+        <div className="event-heading"><h3>{e.title}</h3><EventStatus status={e.status}/></div>
         <p className="event-meta"><span><Icon name="clock" size={14} />{fmtTime(e.starts_at)}{e.ends_at ? ` – ${fmtTime(e.ends_at)}` : ''}</span>{e.location && <span><Icon name="pin" size={14} />{e.location}</span>}</p>
         {e.description && <p className={`event-desc${open ? ' is-open' : ''}`} onClick={() => setOpen(!open)}>{e.description}</p>}
         <div className="event-actions">
-          {!past && <button className="btn btn-ghost btn-sm" onClick={() => addToCalendar(e)}><Icon name="calendar" size={15} />Add to calendar</button>}
+          {!past && !['cancelled','postponed','completed'].includes(e.status) && <button className="btn btn-ghost btn-sm" onClick={() => addToCalendar(e)}><Icon name="calendar" size={15} />Add to calendar</button>}
           <Link to={`/notes?ref=${e.kind}:${e.id}`} className={`btn btn-ghost btn-sm${hasNote ? ' has-note' : ''}`}><Icon name="note" size={15} />{hasNote ? 'My notes' : 'Take notes'}</Link>
         </div>
       </div>
@@ -35,8 +35,8 @@ export function Events() {
   const [tab, setTab] = useState<'up' | 'past'>('up')
   const now = Date.now() - 3 * 3600e3
   const all = q.data ?? []
-  const up = all.filter((e) => new Date(e.starts_at).getTime() >= now).sort((a, b) => a.starts_at.localeCompare(b.starts_at))
-  const past = all.filter((e) => new Date(e.starts_at).getTime() < now).sort((a, b) => b.starts_at.localeCompare(a.starts_at))
+  const up = all.filter((e) => new Date(e.starts_at).getTime() >= now && e.status !== 'completed').sort((a, b) => a.starts_at.localeCompare(b.starts_at))
+  const past = all.filter((e) => new Date(e.starts_at).getTime() < now || e.status === 'completed').sort((a, b) => b.starts_at.localeCompare(a.starts_at))
   const list = tab === 'up' ? up : past
   return (
     <div className="page">

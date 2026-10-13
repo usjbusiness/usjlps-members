@@ -1,0 +1,2 @@
+const labels:Record<string,string>={tentative:'Tentative',scheduled:'Scheduled',confirmed:'Confirmed',upcoming:'Upcoming',completed:'Held',postponed:'Postponed',cancelled:'Cancelled'}
+export function EventStatus({status}:{status:string}){const value=Object.hasOwn(labels,status)?status:'unknown';return <span className={`event-status event-status-${value}`}><i aria-hidden="true"/>{labels[status]??'Status unavailable'}</span>}
