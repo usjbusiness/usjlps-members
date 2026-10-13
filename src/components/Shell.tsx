@@ -20,6 +20,7 @@ export const MORE = [
   { to: '/certificate', label: 'LPS Certificate', icon: 'cert' },
   { to: '/apparel', label: 'LPS Merch', icon: 'shirt' },
   { to: '/propose', label: 'Propose an Event', icon: 'bulb' },
+  { to: '/leadership', label: 'Leadership Opportunities', icon: 'people' },
   { to: '/record', label: 'My Record', icon: 'record' },
   { to: '/resume', label: 'Résumé Builder', icon: 'resume' },
   { to: '/install', label: 'Get the App', icon: 'phone' },
