@@ -16,7 +16,7 @@ export function EventPreregistration({ event, home = false }: { event: MemberEve
   const hasPlans = !!row?.my_planning || !!row?.planning_count
   if (!eligible && !hasPlans && !home) return null
   const closedReason = event.status === 'postponed'
-    ? 'This meeting is postponed. Pre-registration will reopen once a new date is scheduled or confirmed.'
+    ? (home ? 'Postponed — pre-registration reopens when rescheduled.' : 'This meeting is postponed. Pre-registration will reopen once a new date is scheduled or confirmed.')
     : event.status === 'cancelled' ? 'This event has been cancelled. Pre-registration is closed.'
     : 'Pre-registration is closed because this event has started or is no longer scheduled.'
   async function toggle() {
@@ -35,16 +35,16 @@ export function EventPreregistration({ event, home = false }: { event: MemberEve
   }
   return <section className={`event-prereg${home ? ' event-prereg-home' : ''}`} aria-label="Optional pre-registration">
     {(eligible || hasPlans) && <div className="event-prereg-top">
-      <div><span className="event-prereg-label">Optional pre-registration</span><p className="event-prereg-count" aria-live="polite">{row ? <><b>{row.planning_count}</b> {row.planning_count === 1 ? 'person' : 'people'} planning to attend</> : q.isError ? 'Count unavailable' : 'Loading attendance plans…'}</p></div>
+      <div><span className="event-prereg-label">Optional pre-registration</span><p className="event-prereg-count" aria-live="polite">{row ? <><b>{row.planning_count}</b> <span>{home ? 'planning to attend' : `${row.planning_count === 1 ? 'person' : 'people'} planning to attend`}</span></> : q.isError ? 'Count unavailable' : 'Loading attendance plans…'}</p></div>
       {(eligible || row?.my_planning) && <button type="button" className={`btn btn-sm ${row?.my_planning ? 'btn-ghost' : 'btn-gold'}`} aria-pressed={!!row?.my_planning} aria-describedby={noteId} disabled={busy || !row || q.isError} onClick={toggle}>
-        <Icon name={row?.my_planning ? 'check' : 'people'} size={16} />{busy ? 'Saving…' : row?.my_planning ? 'Cancel my pre-registration' : 'I plan to attend'}
+        <Icon name={row?.my_planning ? 'check' : 'people'} size={16} />{busy ? 'Saving…' : row?.my_planning ? (home ? 'Cancel my plan' : 'Cancel my pre-registration') : 'I plan to attend'}
       </button>}
     </div>}
-    {eligible && <p id={noteId} className="event-prereg-note">You’re welcome with or without pre-registering. Pre-register for priority seating, subject to availability — not a guaranteed seat. Your response helps us choose the room.</p>}
-    {eligible && event.status === 'tentative' && <p className="event-prereg-note">This meeting is still tentative. Pre-registering shows your interest; check back for confirmed details.</p>}
+    {eligible && <p id={noteId} className="event-prereg-note">{home ? 'Walk-ins welcome. Pre-register for seating priority, not a guaranteed seat.' : 'You’re welcome with or without pre-registering. Pre-register for priority seating, subject to availability — not a guaranteed seat. Your response helps us choose the room.'}</p>}
+    {eligible && event.status === 'tentative' && <p className="event-prereg-note">{home ? 'Tentative — details may change.' : 'This meeting is still tentative. Pre-registering shows your interest; check back for confirmed details.'}</p>}
     {!eligible && <p id={noteId} className="event-prereg-closed"><Icon name="clock" size={17} /><span>{closedReason}</span></p>}
-    {row?.my_planning && <p className="event-prereg-saved"><Icon name="check" size={14} />Your plan is saved. You can cancel it if your plans change.</p>}
-    {notice && <p className="event-prereg-saved" role="status">{notice}</p>}
+    {row?.my_planning && <p className="event-prereg-saved"><Icon name="check" size={14} />{home ? 'Your plan is saved.' : 'Your plan is saved. You can cancel it if your plans change.'}</p>}
+    {notice && !row?.my_planning && <p className="event-prereg-saved" role="status">{notice}</p>}
     {error && <p className="event-prereg-error" role="alert">{error}</p>}
     {q.isError && (eligible || hasPlans) && <p className="event-prereg-error" role="alert">Pre-registration is temporarily unavailable. <button className="link" onClick={() => void q.refetch()}>Try again</button></p>}
   </section>

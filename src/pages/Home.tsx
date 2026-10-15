@@ -59,7 +59,7 @@ export function Home() {
   const r = rankOf(me.total)
   const name = me.member?.full_name ?? me.board?.full_name ?? ''
   const now = Date.now()
-  const upcoming = events.filter((e) => new Date(e.starts_at).getTime() > now - 3 * 3600e3 && !['cancelled','completed'].includes(e.status)).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 3)
+  const upcoming = events.filter((e) => new Date(e.starts_at).getTime() > now - 3 * 3600e3 && !['cancelled','completed'].includes(e.status)).sort((a, b) => a.starts_at.localeCompare(b.starts_at))
   const seen = seenPosts()
   const groupme = me.settings?.groupme_url
   const people = useDirectory().data ?? []
@@ -95,7 +95,7 @@ export function Home() {
         </Link>
       )}
 
-      <HomePolls me={me} />
+      <div id="home-below-events" className="home-below-events"><HomePolls me={me} /></div>
 
       <div className="home-grid">
         <section className="panel rankpanel span2">
