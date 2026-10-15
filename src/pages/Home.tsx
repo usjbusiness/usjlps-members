@@ -1,7 +1,7 @@
-import { EventStatus } from '@/components/EventStatus'
+import { HomeEvents } from '@/components/HomeEvents'
 import { Link } from 'react-router-dom'
 import { isOnline, rankOf, useDirectory, useEvents, useLiveNow, useMe, usePolls, usePosts, type Me } from '@/lib/api'
-import { fmtDate, fmtTime, fmtWhen, firstName, greeting } from '@/lib/format'
+import { fmtDate, fmtWhen, firstName, greeting } from '@/lib/format'
 import { Avatar, Icon, Medal } from '@/components/ui'
 import { Net } from '@/components/Net'
 import { InterestsPicker, PollCard } from '@/components/Polls'
@@ -85,6 +85,8 @@ export function Home() {
         </Link>
       )}
 
+      <HomeEvents events={upcoming} />
+
       {online.length > 0 && (
         <Link to="/people" className="onlinebar">
           <span className="onlinebar-faces">{online.slice(0, 5).map((p) => <Avatar key={p.person_key} name={p.full_name} path={p.avatar_url} size={30} />)}</span>
@@ -96,7 +98,7 @@ export function Home() {
       <HomePolls me={me} />
 
       <div className="home-grid">
-        <section className="panel rankpanel">
+        <section className="panel rankpanel span2">
           <div className="panel-head"><h2>Your rank</h2><Link to="/rank" className="more">Stickers<Icon name="arrow" size={14} /></Link></div>
           <div className="rank-now">
             <Medal rank={r.rank.key} size={74} />
@@ -108,17 +110,6 @@ export function Home() {
           </div>
           <p className="muted small">{r.next ? <>Next unlock: <b>{r.next.perk}</b></> : r.rank.perk}</p>
           {me.stickers.length > 0 && <div className="mini-stickers">{me.stickers.slice(0, 6).map((s, i) => <span key={i} className={`sticker-disc sm${s.headliner ? ' gold' : ''}`} title={s.title}><img src="/img/mono-gold.webp" alt="" /></span>)}<Link to="/rank" className="more">{me.stickers.length} event{me.stickers.length === 1 ? '' : 's'}<Icon name="arrow" size={13} /></Link></div>}
-        </section>
-
-        <section className="panel">
-          <div className="panel-head"><h2>Coming up</h2><Link to="/events" className="more">All events<Icon name="arrow" size={14} /></Link></div>
-          {upcoming.length ? <ul className="mini-events">{upcoming.map((e) => (
-            <li key={`${e.kind}-${e.id}`}>
-              <span className="datetile"><small>{fmtDate(e.starts_at, { month: 'short' })}</small><b>{fmtDate(e.starts_at, { day: 'numeric' })}</b></span>
-              <span className="mini-event-copy"><strong>{e.title}</strong><small>{fmtTime(e.starts_at)}{e.location ? ` · ${e.location}` : ''}</small></span>
-              <span className="mini-event-statuses"><EventStatus status={e.status}/>{e.headliner && <span className="chip chip-gold">×2</span>}</span>
-            </li>
-          ))}</ul> : <p className="muted small pad">No events scheduled yet. The e-board will post the next one soon.</p>}
         </section>
 
         <section className="panel span2">

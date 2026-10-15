@@ -11,6 +11,8 @@ export function Net({ density = 1, className = '' }: { density?: number; classNa
     let nodes: N[] = []
     const pulses: { a: number; b: number; t: number; s: number }[] = []
     const resize = () => {
+      // A new node array invalidates in-flight pulse indices.
+      pulses.length = 0
       dpr = Math.min(2, devicePixelRatio || 1); w = c.clientWidth; h = c.clientHeight
       c.width = w * dpr; c.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       const n = Math.round(Math.min(90, (w * h) / 16000) * density)
