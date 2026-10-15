@@ -1,3 +1,4 @@
+import { FeaturedGuest } from '@/components/FeaturedGuest'
 import { EventPreregistration } from '@/components/EventPreregistration'
 import { EventStatus } from '@/components/EventStatus'
 import { useState } from 'react'
@@ -17,9 +18,14 @@ function EventCard({ e, past, hasNote }: { e: MemberEvent; past?: boolean; hasNo
           {e.headliner && <span className="chip chip-gold"><Icon name="star" size={12} />Headliner · counts double</span>}
           {past && e.attended && <span className="chip chip-ok"><Icon name="check" size={12} />Sticker earned</span>}
         </div>
+        <div className="meeting-with-guest">
+        <div className="event-details-copy">
         <div className="event-heading"><h3>{e.title}</h3><EventStatus status={e.status}/></div>
         <p className="event-meta"><span><Icon name="clock" size={14} />{fmtTime(e.starts_at)}{e.ends_at ? ` – ${fmtTime(e.ends_at)}` : ''}</span>{e.location && <span><Icon name="pin" size={14} />{e.location}</span>}</p>
         {e.description && <p className={`event-desc${open ? ' is-open' : ''}`} onClick={() => setOpen(!open)}>{e.description}</p>}
+        </div>
+        <FeaturedGuest event={e} />
+        </div>
         {!past && <EventPreregistration event={e} />}
         <div className="event-actions">
           {!past && !['cancelled','postponed','completed'].includes(e.status) && <button className="btn btn-ghost btn-sm" onClick={() => addToCalendar(e)}><Icon name="calendar" size={15} />Add to calendar</button>}

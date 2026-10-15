@@ -1,3 +1,4 @@
+import { FeaturedGuest } from './FeaturedGuest'
 import { Link } from 'react-router-dom'
 import type { MemberEvent } from '@/lib/api'
 import { addToCalendar, fmtDate, fmtTime } from '@/lib/format'
@@ -17,6 +18,7 @@ export function HomeEvents({ events }: { events: MemberEvent[] }) {
       {events.map((e, i) => {
         const canPlan = ['tentative', 'scheduled', 'confirmed', 'upcoming'].includes(e.status) && new Date(e.starts_at).getTime() > Date.now()
         return <article key={`${e.kind}-${e.id}`} className={`home-meetup${i === 0 ? ' home-meetup-featured' : ''}`} aria-label={e.title}>
+          <div className="meeting-with-guest">
           <div className="home-meetup-top">
             <div className="home-meetup-date" aria-label={fmtDate(e.starts_at, { month: 'long', day: 'numeric', weekday: 'long' })}>
               <span>{fmtDate(e.starts_at, { month: 'short' })}</span><b>{fmtDate(e.starts_at, { day: 'numeric' })}</b><small>{fmtDate(e.starts_at, { weekday: 'short' })}</small>
@@ -27,6 +29,8 @@ export function HomeEvents({ events }: { events: MemberEvent[] }) {
               <p className="home-meetup-meta"><span><Icon name="clock" size={16} />{fmtTime(e.starts_at)}{e.ends_at ? ` – ${fmtTime(e.ends_at)}` : ''}</span><span><Icon name="pin" size={16} />{e.location || 'Location to be announced'}</span></p>
               {e.headliner && <span className="home-meetup-headliner"><Icon name="star" size={14} />Headliner · double stickers for attending</span>}
             </div>
+          </div>
+          <FeaturedGuest event={e} />
           </div>
           <EventPreregistration event={e} home />
           <div className="home-meetup-links">
