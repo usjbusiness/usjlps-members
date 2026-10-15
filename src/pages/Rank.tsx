@@ -32,7 +32,7 @@ export function RankPage() {
             <div key={x.key} className={`step${done ? ' is-done' : ''}${cur ? ' is-cur' : ''}`}>
               <Medal rank={x.key} size={46} locked={!done} />
               <div><strong>{x.name}{cur && <em className="you">You</em>}</strong><small>{x.min === 0 ? 'Approved application' : `${x.min} stickers`}</small><p>{x.perk}</p>
-                {x.key === 'bronze' && done && <Link to="/apparel" className="more">Request your pin<Icon name="arrow" size={13} /></Link>}
+                {x.key === 'bronze' && done && <Link to="/people/me" className="more">Personalize your Bronze page<Icon name="arrow" size={13} /></Link>}
                 {x.key === 'silver' && done && <span className="step-links"><Link to="/apparel" className="more">Request your polo<Icon name="arrow" size={13} /></Link><Link to="/certificate" className="more">Get your certificate<Icon name="arrow" size={13} /></Link></span>}</div>
               {done ? <Icon name="check" size={18} className="step-ic" /> : <Icon name="lock" size={16} className="step-ic" />}
             </div>

@@ -84,7 +84,7 @@ export const useAvatar = (path: string | null | undefined) => useQuery({
 // ---- Ranks ---------------------------------------------------------------
 export const RANKS = [
   { key: 'member', name: 'Member', min: 0, perk: 'Every event, the member portal, the library and the GroupMe chat.' },
-  { key: 'bronze', name: 'Bronze', min: 3, perk: 'The LPS lapel pin and an LPS sticker, requested right here in the portal. Bronze page headers.' },
+  { key: 'bronze', name: 'Bronze', min: 3, perk: 'Unlock Bronze and Burgundy page headers. Your Bronze rank appears on your LPS profile — a visible recognition of your participation.' },
   { key: 'silver', name: 'Silver', min: 6, perk: 'The LPS polo and a signed LPS certificate for your résumé and LinkedIn (it also needs a finished résumé and a public LPS page or LinkedIn). Silver page headers.' },
   { key: 'gold', name: 'Gold', min: 10, perk: 'Priority seats and meet-and-greets with headline guests. The Gold certificate “with Distinction”. The Gold header and your own header photo.' },
   { key: 'ivy', name: 'Ivy', min: 15, perk: 'Company trips, an e-board reference and the chance to co-host. The Ivy certificate “with Highest Distinction”. The green Ivy headers.' },
@@ -236,3 +236,12 @@ export const RESUME_MISSING: Record<string, string> = {
 }
 
 export const usePolls = () => useQuery({ queryKey: ['polls'], staleTime: 20_000, refetchInterval: 30_000, queryFn: () => rpc<Poll[]>('member_polls_list') })
+
+// Optional, shared pre-registration; deliberately separate from attendance/stickers.
+export interface EventPreregistration { id: string; kind: 'meeting' | 'event'; planning_count: number; my_planning: boolean }
+export const useEventPreregistrations = () => useQuery({
+  queryKey: ['event-preregistrations'], staleTime: 15_000, refetchInterval: 30_000,
+  refetchOnWindowFocus: true, queryFn: () => rpc<EventPreregistration[]>('member_event_preregistrations'),
+})
+export const setEventPreregistration = (kind: MemberEvent['kind'], id: string, planning: boolean) =>
+  rpc<void>('member_set_event_preregistration', { p_kind: kind, p_id: id, p_planning: planning })

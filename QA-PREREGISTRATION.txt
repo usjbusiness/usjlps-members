@@ -1,0 +1,21 @@
+LOCAL VERIFICATION
+- TypeScript type check and Vite production build passed.
+- 24 database checks passed in a local PGlite PostgreSQL-compatible test instance
+  with the project's existing migration set, not the live Supabase project.
+- Verified shared counts, per-account state, repeat submit/cancel idempotency,
+  ordinary member and officer use, private e-board meetings, hidden planning
+  events, future status eligibility, closed/past events, invalid IDs/inputs,
+  anonymous and outsider denial, suspended member denial, blocked direct
+  table access, safe repeat migration and source-deletion cascade.
+- Automated Chromium UI check used mocked backend data at desktop 1280px
+  and mobile 390px: save/cancel and count changes, failed write, failed read
+  with disabled action, eligible vs cancelled states, no horizontal overflow,
+  no page runtime errors.
+- Mobile screenshot inspected.
+- Vite emits the pre-existing advisory about large JavaScript chunks.
+
+NOT VERIFIED / NOT DONE
+- No SQL applied to production Supabase.
+- No member portal deployment published.
+- No real accounts or real event pre-registrations were created by these tests.
+- Final real-account smoke test should follow installation.

@@ -3,14 +3,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { APPAREL_STATUS, useMe } from '@/lib/api'
 import { supabase } from '@/lib/supabase'
-import { COLORS, Pin, Polo, type ColorKey } from '@/components/Apparel'
+import { COLORS, Polo, type ColorKey } from '@/components/Apparel'
 import { Icon, PageHead, useToast } from '@/components/ui'
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-type Item = 'pin' | 'polo'
+type Item = 'polo'
 const ITEMS: Record<Item, { name: string; tag: string; min: number; rank: string; colors: ColorKey[]; lines: string[] }> = {
-  pin: { name: 'The LPS Pin', tag: 'Bronze reward', min: 3, rank: 'Bronze', colors: [],
-    lines: ['Gold-plated lapel pin with the LPS monogram', 'Ivy-green hard enamel, butterfly clutch back', 'Comes with an LPS sticker for your laptop'] },
   polo: { name: 'The LPS Polo', tag: 'Silver reward', min: 6, rank: 'Silver', colors: ['black', 'ivy', 'white'],
     lines: ['Embroidered LPS monogram on the left chest', 'Breathable piqué knit, three-button placket', 'Made for Headliners, trips and interviews'] },
 }
@@ -44,9 +42,9 @@ function Product({ item }: { item: Item }) {
   }
   return (
     <article className="product">
-      <div className={`product-stage bg-${item === 'pin' ? 'black' : color}`}>
+      <div className={`product-stage bg-${color}`}>
         <span className="product-tag">{def.tag}</span>
-        {item === 'polo' ? <Polo color={color} className="product-img" /> : <Pin className="product-img is-pin" />}
+        <Polo color={color} className="product-img" />
       </div>
       <div className="product-info">
         <h2>{def.name}</h2>
@@ -75,15 +73,15 @@ function Product({ item }: { item: Item }) {
 
 export function ApparelPage() {
   const me = useMe().data!
-  const oldCap = me.requests.find((x) => x.item === 'cap')
+  const hasPreviousMerch = me.requests.some((x) => x.item !== 'polo')
   return (
     <div className="page">
-      <PageHead eyebrow="Earned, not bought" title="LPS Merch" sub="Reach Bronze (3 stickers) for the LPS pin and sticker. Reach Silver (6 stickers) for the LPS polo. One of each per member." />
-      {oldCap && <p className="notice">Your earlier cap request is still on file: <b>{APPAREL_STATUS[oldCap.status] ?? oldCap.status}</b>.</p>}
-      <div className="products"><Product item="pin" /><Product item="polo" /></div>
+      <PageHead eyebrow="Earned, not bought" title="LPS Merch" sub="Reach Silver (6 stickers) to request the LPS polo. One polo per member. Bronze (3 stickers) unlocks Bronze and Burgundy headers for your LPS page." />
+      {hasPreviousMerch && <p className="notice">Previous merch requests remain in <Link to="/record" className="link">My Record</Link>. Contact the e-board about their status.</p>}
+      <div className="products polo-only"><Product item="polo" /></div>
       <section className="howto">
         <div><b>1</b><strong>Earn stickers</strong><span>Come to General Meetings and events. Headliners count double.</span></div>
-        <div><b>2</b><strong>Request in one tap</strong><span>3 stickers unlock the pin, 6 unlock the polo.</span></div>
+        <div><b>2</b><strong>Request in one tap</strong><span>6 stickers unlock the polo. Choose your size and color.</span></div>
         <div><b>3</b><strong>Pick it up</strong><span>We will tell you when it is ready at the next meeting.</span></div>
       </section>
       <p className="muted small">Merch is funded through the SGA budget once the Society is recognized. Final colors and details may change slightly with the supplier.</p>

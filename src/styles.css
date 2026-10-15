@@ -1246,3 +1246,18 @@ dl.pp-facts { margin: 0; display: grid; gap: 4px; }
 
 .org-report-list::before,.org-support-list::before { content:""; position:absolute; left:-2px; top:-16px; height:16px; border-left:2px solid var(--lead-muted); }
 .org-majors>.org-node::before { content:""; position:absolute; left:50%; top:-17px; height:16px; border-left:2px solid var(--lead-muted); }
+
+/* Silver merch: one polo, no physical Bronze pin offered. */
+.products.polo-only{grid-template-columns:1fr}
+@media(min-width:900px){.products.polo-only .product{display:grid;grid-template-columns:1fr 1fr}}
+
+/* Optional pre-registration: shared room-planning count, not a ticket. */
+.event-prereg { margin: 16px 0; padding: 16px; border: 1px solid rgba(201,165,76,.28); border-radius: 12px; background: rgba(201,165,76,.045); }
+.event-prereg-top { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.event-prereg-label { font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--mute); }
+.event-prereg-count { margin: 5px 0 0; font-size: 13px; }
+.event-prereg-count b { font-size: 22px; margin-right: 3px; }
+.event-prereg-note { margin: 10px 0 0; font-size: 12px; line-height: 1.65; color: var(--mute); max-width: 680px; }
+.event-prereg-saved { display: flex; align-items: center; gap: 6px; margin: 9px 0 0; font-size: 12px; }
+.event-prereg-error { margin: 9px 0 0; color: #c45b57; font-size: 12px; }
+@media (max-width: 560px) { .event-prereg { padding: 12px; } .event-prereg-top > .btn { width: 100%; justify-content: center; white-space: normal; } }

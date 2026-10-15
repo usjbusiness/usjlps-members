@@ -1,3 +1,4 @@
+import { EventPreregistration } from '@/components/EventPreregistration'
 import { EventStatus } from '@/components/EventStatus'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -19,6 +20,7 @@ function EventCard({ e, past, hasNote }: { e: MemberEvent; past?: boolean; hasNo
         <div className="event-heading"><h3>{e.title}</h3><EventStatus status={e.status}/></div>
         <p className="event-meta"><span><Icon name="clock" size={14} />{fmtTime(e.starts_at)}{e.ends_at ? ` – ${fmtTime(e.ends_at)}` : ''}</span>{e.location && <span><Icon name="pin" size={14} />{e.location}</span>}</p>
         {e.description && <p className={`event-desc${open ? ' is-open' : ''}`} onClick={() => setOpen(!open)}>{e.description}</p>}
+        {!past && <EventPreregistration event={e} />}
         <div className="event-actions">
           {!past && !['cancelled','postponed','completed'].includes(e.status) && <button className="btn btn-ghost btn-sm" onClick={() => addToCalendar(e)}><Icon name="calendar" size={15} />Add to calendar</button>}
           <Link to={`/notes?ref=${e.kind}:${e.id}`} className={`btn btn-ghost btn-sm${hasNote ? ' has-note' : ''}`}><Icon name="note" size={15} />{hasNote ? 'My notes' : 'Take notes'}</Link>
