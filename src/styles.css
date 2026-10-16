@@ -1481,3 +1481,13 @@ html { scrollbar-width:thin; scrollbar-color:#71603b #0b0b0b; }
 .home .home-voice .panel { background:#131313; }
 .home .home-voice .btn-gold { background:#d7b766; color:#15120c; animation:none; box-shadow:none; }
 .home .home-voice .btn-gold:hover:not(:disabled) { background:#ebcd87; color:#15120c; box-shadow:none; }
+
+/* Ordinary meeting text belongs on Home too; no guest required. */
+.home-meetups-list { align-items:flex-start; }
+.home-meetup { align-self:flex-start; }
+.home-meetup-description { margin-top:14px; color:#c7c0b4; min-width:0; }
+.home-meetup-description p { font-size:14px; line-height:1.6; white-space:pre-line; overflow-wrap:anywhere; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; overflow:hidden; }
+.home-meetup-description p.is-open { display:block; -webkit-line-clamp:unset; overflow:visible; }
+.home-description-toggle { display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:4px 0; border:0; background:none; color:#e1c486; font:500 14px/1.4 var(--sans); }
+.home-description-toggle:hover { color:#f3dda7; }
+.home-description-toggle:focus-visible { outline:2px solid #edcf8c; outline-offset:3px; }

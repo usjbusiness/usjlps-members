@@ -7,24 +7,49 @@ import { EventPreregistration } from './EventPreregistration'
 import { EventStatus } from './EventStatus'
 import { Icon } from './ui'
 
+/** The meeting description is independent of the optional guest profile. */
+function MeetingDescription({ text, title }: { text: string; title: string }) {
+  const body = useRef<HTMLParagraphElement>(null)
+  const bodyId = useId()
+  const [expanded, setExpanded] = useState(false)
+  const [canExpand, setCanExpand] = useState(false)
+  useEffect(() => { setExpanded(false) }, [text])
+  useEffect(() => {
+    const el = body.current
+    if (!el) return
+    const measure = () => {
+      if (!expanded) setCanExpand(el.scrollHeight > el.clientHeight + 1)
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [text, expanded])
+  return <div className="home-meetup-description">
+    <p ref={body} id={bodyId} className={expanded ? 'is-open' : ''}>{text}</p>
+    {canExpand && <button type="button" className="home-description-toggle" aria-expanded={expanded} aria-controls={bodyId} aria-label={`${expanded ? 'Show less' : 'Read more'} about ${title}`} onClick={() => setExpanded(value => !value)}>{expanded ? 'Show less' : 'Read more'}<Icon name={expanded ? 'up' : 'down'} size={14} /></button>}
+  </div>
+}
+
 /** Native scroll + snap: works with touch, trackpad, buttons and keyboard. */
 export function HomeEvents({ events }: { events: MemberEvent[] }) {
   const track = useRef<HTMLDivElement>(null)
   const trackId = useId()
-  const [position, setPosition] = useState({ index: 0, left: false, right: false })
+  const [position, setPosition] = useState({ index: 0, left: false, right: false, height: undefined as number | undefined })
   useEffect(() => {
     const el = track.current
     if (!el) return
     const update = () => {
       const cards = Array.from(el.querySelectorAll<HTMLElement>('article'))
       const index = cards.reduce((best, card, i) => Math.abs(card.offsetLeft - el.scrollLeft) < Math.abs((cards[best]?.offsetLeft ?? 0) - el.scrollLeft) ? i : best, 0)
-      setPosition({ index, left: el.scrollLeft > 4, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 })
+      setPosition({ index, left: el.scrollLeft > 4, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4, height: matchMedia('(max-width: 560px)').matches && cards[index] ? cards[index].offsetHeight + 12 : undefined })
     }
     update()
     el.addEventListener('scroll', update, { passive: true })
     const ro = new ResizeObserver(update); ro.observe(el)
+    el.querySelectorAll('article').forEach(card => ro.observe(card))
     return () => { el.removeEventListener('scroll', update); ro.disconnect() }
-  }, [events.length])
+  }, [events])
   function move(direction: number) {
     const el = track.current
     if (!el) return
@@ -41,7 +66,7 @@ export function HomeEvents({ events }: { events: MemberEvent[] }) {
         {events.length > 1 && (position.left || position.right) && <div className="meetup-arrows"><button type="button" aria-label="Previous event" aria-controls={trackId} disabled={!position.left} onClick={() => move(-1)}><Icon name="back" size={18} /></button><button type="button" aria-label="Next event" aria-controls={trackId} disabled={!position.right} onClick={() => move(1)}><Icon name="arrow" size={18} /></button></div>}
       </div>
     </div>
-    <div ref={track} id={trackId} className="home-meetups-list" tabIndex={0} role="region" aria-label="Upcoming events — scroll horizontally" onKeyDown={e => {
+    <div ref={track} id={trackId} className="home-meetups-list" style={{ height: position.height }} tabIndex={0} role="region" aria-label="Upcoming events — scroll horizontally" onKeyDown={e => {
       if (e.target !== e.currentTarget) return
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); move(e.key === 'ArrowRight' ? 1 : -1) }
     }}>
@@ -58,6 +83,7 @@ export function HomeEvents({ events }: { events: MemberEvent[] }) {
               <p className="home-meetup-meta"><span><Icon name="clock" size={14} />{fmtTime(e.starts_at)}{e.ends_at ? ` – ${fmtTime(e.ends_at)}` : ''}</span><span><Icon name="pin" size={14} />{e.location || 'Location to be announced'}</span></p>
             </div>
           </div>
+          {e.description?.trim() && <MeetingDescription text={e.description.trim()} title={e.title} />}
           <FeaturedGuest event={e} />
           <EventPreregistration event={e} home />
           <div className="home-meetup-links">
