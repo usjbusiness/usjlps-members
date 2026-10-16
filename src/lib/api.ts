@@ -247,7 +247,7 @@ export const setEventPreregistration = (kind: MemberEvent['kind'], id: string, p
   rpc<void>('member_set_event_preregistration', { p_kind: kind, p_id: id, p_planning: planning })
 
 // Explicitly published guest affiliation, independent of Headliner/stickers.
-export interface EventGuest { id: string; kind: MemberEvent['kind']; guest_name: string | null; guest_role: string | null; guest_company: string | null; guest_logo_path: string | null }
+export interface EventGuest { id: string; kind: MemberEvent['kind']; guest_name: string | null; guest_role: string | null; guest_company: string | null; guest_description: string | null; guest_logo_path: string | null }
 export const useEventGuests = () => useQuery({
   queryKey: ['event-guests'], staleTime: 30_000, refetchInterval: 30_000, refetchOnWindowFocus: true,
   queryFn: () => rpc<EventGuest[]>('member_event_guests'),
