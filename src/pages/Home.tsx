@@ -2,7 +2,7 @@ import { HomeEvents } from '@/components/HomeEvents'
 import { Link } from 'react-router-dom'
 import { isOnline, rankOf, useDirectory, useEvents, useLiveNow, useMe, usePolls, usePosts, type Me } from '@/lib/api'
 import { fmtDate, fmtWhen, firstName, greeting } from '@/lib/format'
-import { Avatar, Icon, Medal } from '@/components/ui'
+import { Avatar, ErrorBox, Icon, Medal, Spinner } from '@/components/ui'
 import { Net } from '@/components/Net'
 import { InterestsPicker, PollCard } from '@/components/Polls'
 import { seenPosts } from './News'
@@ -51,16 +51,49 @@ function HomePolls({ me }: { me: Me }) {
   )
 }
 
+/** Operational updates belong above tools, personalization and rewards. */
+function HomeAnnouncements() {
+  const q = usePosts()
+  const seen = seenPosts()
+  const posts = [...(q.data ?? [])].sort((a, b) =>
+    Number(b.priority === 'urgent') - Number(a.priority === 'urgent') ||
+    Number(b.pinned) - Number(a.pinned) ||
+    Number(b.priority === 'important') - Number(a.priority === 'important') ||
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const unread = posts.filter(p => new Date(p.created_at).getTime() > seen).length
+  return <section className="home-announcements" aria-labelledby="home-announcements-title">
+    <div className="home-section-heading">
+      <div><h2 id="home-announcements-title">Announcements{unread > 0 && <span className="home-unread">{unread} new</span>}</h2><p>Updates, deadlines and opportunities from the e-board.</p></div>
+      <Link to="/news" className="more">All announcements<Icon name="arrow" size={14} /></Link>
+    </div>
+    {q.isLoading ? <div className="home-announcements-state"><Spinner /></div> : q.error ? <ErrorBox error={q.error} retry={() => q.refetch()} /> : posts.length ? <ul className="home-announcement-list">
+      {posts.slice(0, 3).map(p => <li key={p.id}>
+        <Link to={`/news#${p.id}`} className={`home-announcement home-announcement-${p.priority}`}>
+          <span className="home-announcement-copy">
+            <span className="home-announcement-meta">
+              {p.priority === 'urgent' ? <b className="home-announcement-priority is-urgent">Urgent</b> : p.priority === 'important' ? <b className="home-announcement-priority">Important</b> : null}
+              {p.pinned && <span className="home-announcement-pinned"><Icon name="pin" size={14} />Pinned</span>}
+              {new Date(p.created_at).getTime() > seen && <span className="home-announcement-new">New</span>}
+              <time dateTime={p.created_at}>{fmtWhen(p.created_at).split(' · ')[0]}</time>
+            </span>
+            <strong>{p.title}</strong>
+            <span className="home-announcement-excerpt">{p.body.slice(0, 200)}{p.body.length > 200 ? '…' : ''}</span>
+          </span>
+          <Icon name="arrow" size={18} />
+        </Link>
+      </li>)}
+    </ul> : <div className="home-announcements-state"><Icon name="news" size={20} /><p>No announcements yet. New updates will appear here.</p></div>}
+  </section>
+}
+
 export function Home() {
   const me = useMe().data!
-  const posts = usePosts().data ?? []
   const events = useEvents().data ?? []
   const live = useLiveNow().data
   const r = rankOf(me.total)
   const name = me.member?.full_name ?? me.board?.full_name ?? ''
   const now = Date.now()
   const upcoming = events.filter((e) => new Date(e.starts_at).getTime() > now - 3 * 3600e3 && !['cancelled','completed'].includes(e.status)).sort((a, b) => a.starts_at.localeCompare(b.starts_at))
-  const seen = seenPosts()
   const groupme = me.settings?.groupme_url
   const people = useDirectory().data ?? []
   const online = [...new Map(people.filter((p) => !p.is_me && isOnline(p.last_seen_at)).map((p) => [p.person_key, p])).values()]
@@ -87,6 +120,23 @@ export function Home() {
 
       <HomeEvents events={upcoming} />
 
+      <div id="home-below-events" className="home-below-events">
+        <HomeAnnouncements />
+      </div>
+
+      <section className="home-workspace" aria-labelledby="home-workspace-title">
+        <div className="home-section-heading"><div><h2 id="home-workspace-title">Your workspace</h2><p>Useful tools, one click away.</p></div></div>
+        <div className="quick home-tools">
+          <Link to="/watch?tab=library" className="qa"><Icon name="live" size={22} /><strong>The Library</strong><small>Presentations &amp; simulations</small></Link>
+          <Link to="/notes" className="qa"><Icon name="note" size={22} /><strong>My notes</strong><small>Private notes from meetings</small></Link>
+          <Link to="/resume" className="qa"><Icon name="resume" size={22} /><strong>Résumé builder</strong><small>USJ format · Word or PDF</small></Link>
+          {groupme ? <a href={groupme} target="_blank" rel="noopener noreferrer" className="qa"><Icon name="chat" size={22} /><strong>GroupMe chat</strong><small>Connect with the Society</small></a>
+            : <Link to="/people" className="qa"><Icon name="people" size={22} /><strong>Members</strong><small>Find your LPS community</small></Link>}
+        </div>
+      </section>
+
+      <HomePolls me={me} />
+
       {online.length > 0 && (
         <Link to="/people" className="onlinebar">
           <span className="onlinebar-faces">{online.slice(0, 5).map((p) => <Avatar key={p.person_key} name={p.full_name} path={p.avatar_url} size={30} />)}</span>
@@ -95,13 +145,10 @@ export function Home() {
         </Link>
       )}
 
-      <div id="home-below-events" className="home-below-events"><HomePolls me={me} /></div>
-
-      <div className="home-grid">
-        <section className="panel rankpanel span2">
-          <div className="panel-head"><h2>Your rank</h2><Link to="/rank" className="more">Stickers<Icon name="arrow" size={14} /></Link></div>
+        <section className="panel rankpanel home-progress" aria-labelledby="home-progress-title">
+          <div className="panel-head"><h2 id="home-progress-title">Your progress</h2><Link to="/rank" className="more">Stickers<Icon name="arrow" size={14} /></Link></div>
           <div className="rank-now">
-            <Medal rank={r.rank.key} size={74} />
+            <Medal rank={r.rank.key} size={56} />
             <div>
               <strong>{r.rank.name}</strong>
               <span>{me.total} sticker{me.total === 1 ? '' : 's'}{r.next ? ` · ${r.next.min - me.total} to ${r.next.name}` : ' · Top rank'}</span>
@@ -110,29 +157,10 @@ export function Home() {
           </div>
           <p className="muted small">{r.next ? <>Next unlock: <b>{r.next.perk}</b></> : r.rank.perk}</p>
           {me.stickers.length > 0 && <div className="mini-stickers">{me.stickers.slice(0, 6).map((s, i) => <span key={i} className={`sticker-disc sm${s.headliner ? ' gold' : ''}`} title={s.title}><img src="/img/mono-gold.webp" alt="" /></span>)}<Link to="/rank" className="more">{me.stickers.length} event{me.stickers.length === 1 ? '' : 's'}<Icon name="arrow" size={13} /></Link></div>}
+          <div className="home-progress-links"><Link to="/record" className="more">My attendance record<Icon name="arrow" size={14} /></Link></div>
         </section>
 
-        <section className="panel span2">
-          <div className="panel-head"><h2>Announcements</h2><Link to="/news" className="more">See all<Icon name="arrow" size={14} /></Link></div>
-          {posts.length ? <ul className="mini-posts">{posts.slice(0, 3).map((p) => (
-            <li key={p.id}><Link to={`/news#${p.id}`}>
-              <span className={`prio prio-${p.priority}`} />
-              <span>{new Date(p.created_at).getTime() > seen && <em className="new new-top">New</em>}<strong>{p.title}</strong><small>{p.body.slice(0, 140)}{p.body.length > 140 ? '…' : ''}</small></span>
-              <small className="when">{fmtWhen(p.created_at).split(' · ')[0]}</small>
-            </Link></li>
-          ))}</ul> : <p className="muted small pad">No announcements yet.</p>}
-        </section>
-      </div>
-
-      <section className="quick">
-        <Link to="/watch?tab=library" className="qa"><Icon name="live" size={22} /><strong>The Library</strong><small>Past presentations and simulations</small></Link>
-        {groupme ? <a href={groupme} target="_blank" rel="noopener noreferrer" className="qa"><Icon name="chat" size={22} /><strong>GroupMe chat</strong><small>Talk with the whole Society</small></a>
-          : <Link to="/people" className="qa"><Icon name="people" size={22} /><strong>Members</strong><small>Advisors, e-board and members</small></Link>}
-        <Link to="/notes" className="qa"><Icon name="note" size={22} /><strong>My notes</strong><small>Private notes from every meeting</small></Link>
-        <Link to="/resume" className="qa"><Icon name="resume" size={22} /><strong>Résumé builder</strong><small>USJ format, Word or PDF</small></Link>
-        <Link to="/record" className="qa"><Icon name="record" size={22} /><strong>My record</strong><small>Every meeting and sticker, as a PDF</small></Link>
-        <Link to="/install" className="qa"><Icon name="phone" size={22} /><strong>Get the app</strong><small>Add LPS to your home screen</small></Link>
-      </section>
+      <footer className="home-utility"><span>LPS, wherever you go.</span><Link to="/install" className="more"><Icon name="phone" size={16} />Get the app<Icon name="arrow" size={14} /></Link></footer>
     </div>
   )
 }
