@@ -1265,19 +1265,6 @@ dl.pp-facts { margin: 0; display: grid; gap: 4px; }
 /* Featured guest: explicit affiliation, not a sponsor or automatic Headliner. */
 .meeting-with-guest { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
 .meeting-with-guest > .home-meetup-top, .meeting-with-guest > .event-details-copy { flex:1; min-width:0; }
-.featured-guest { width:228px; flex:0 0 228px; display:grid; gap:12px; padding:16px; border:1px solid #31443b; border-radius:12px; background:#142019; }
-.featured-guest-badge { display:flex; align-items:center; gap:7px; color:#acc7b8; font-size:14px; letter-spacing:.02em; font-weight:500; }
-.featured-guest-logo { display:flex; align-items:center; justify-content:center; height:74px; padding:12px; background:#fff; border-radius:6px; }
-.featured-guest-logo img { width:100%; height:100%; object-fit:contain; }
-.featured-guest-copy { display:grid; gap:4px; overflow-wrap:anywhere; }
-.featured-guest-copy strong { font:500 22px/1.2 var(--serif); }
-.featured-guest-copy span { color:var(--mute); font-size:13px; line-height:1.5; }
-.featured-guest-copy b { font-size:14px; font-weight:500; line-height:1.5; color:#d6e6dc; }
-.featured-guest-description { grid-column:1/-1; border-top:1px solid #31443b; padding-top:10px; margin:2px 0 0; color:#c0c9c3; font-size:14px; line-height:1.6; white-space:pre-line; overflow-wrap:anywhere; }
-@media(min-width:1100px) { .home-meetups-list > :not(:first-child) .meeting-with-guest { flex-direction:column; } .home-meetups-list > :not(:first-child) .featured-guest { width:100%; flex-basis:auto; } }
-@media(max-width:800px) { .meeting-with-guest { flex-direction:column; gap:16px; } .featured-guest { width:100%; flex-basis:auto; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:12px 16px; align-items:center; } .featured-guest-badge { grid-column:1/-1; } .featured-guest-logo { height:72px; } .featured-guest-copy { grid-column:2; } .featured-guest-copy:only-child { grid-column:1/-1; } }
-@media(max-width:440px) { .featured-guest { padding:14px; grid-template-columns:92px minmax(0,1fr); gap:12px; } .featured-guest-logo { padding:8px; height:66px; } .featured-guest-copy strong { font-size:21px; } .featured-guest-copy span { font-size:14px; } }
-.featured-guest:not(.has-logo) .featured-guest-copy { grid-column:1/-1; }
 
 /* Compact Home event carousel. A peek of the next card explains the horizontal axis. */
 .home-meetups { min-width:0; margin:0 0 20px; }
@@ -1305,15 +1292,6 @@ dl.pp-facts { margin: 0; display: grid; gap: 4px; }
 .home-meetup-meta > span { display:flex; align-items:center; gap:6px; overflow-wrap:anywhere; }
 .home-meetup-meta svg { color:var(--gold); flex-shrink:0; }
 .home-meetup-headliner { font-size:11px; color:var(--gold2); }
-.home-meetup .featured-guest { width:100%; flex:none; display:grid; grid-template-columns:82px minmax(0,1fr); gap:6px 12px; padding:10px 12px; margin-top:14px; border-radius:8px; }
-.home-meetup .featured-guest-badge { grid-column:1/-1; font-size:14px; letter-spacing:.02em; gap:5px; }
-.home-meetup .featured-guest-badge svg { width:12px; height:12px; }
-.home-meetup .featured-guest-logo { height:44px; padding:6px; }
-.home-meetup .featured-guest-copy { grid-column:2; gap:1px; }
-.home-meetup .featured-guest-copy strong { font-size:18px; }
-.home-meetup .featured-guest-copy span { font-size:13px; line-height:1.35; }
-.home-meetup .featured-guest-copy b { font-size:13px; line-height:1.4; }
-.home-meetup .featured-guest:not(.has-logo) .featured-guest-copy { grid-column:1/-1; }
 .home-meetup .event-prereg-home { margin:14px 0 0; padding:12px 0 0; border:0; border-top:1px solid var(--hair); border-radius:0; background:none; }
 .event-prereg-home .event-prereg-label { display:none; }
 .event-prereg-home .event-prereg-top { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
@@ -1388,7 +1366,6 @@ html { scrollbar-width:thin; scrollbar-color:#71603b #0b0b0b; }
 .meetup-arrows button:hover:not(:disabled) { border-color:#719c84; background:#243c2e; }
 .event-prereg .btn-gold { background:#d5e5da; color:#14231a; animation:none; box-shadow:none; }
 .event-prereg .btn-gold:hover:not(:disabled) { background:#e7f0eb; color:#14231a; box-shadow:none; }
-.home-meetup .featured-guest-copy span, .home-meetup .featured-guest-copy b { font-size:14px; }
 .event .event-prereg { border-color:#31443b; background:#121b16; }
 .event .event-prereg-label { color:#acc7b8; }
 .event .event-prereg-count b { color:var(--text); }
@@ -1397,11 +1374,6 @@ html { scrollbar-width:thin; scrollbar-color:#71603b #0b0b0b; }
 .event > .datetile small, .event-meta svg { color:#b3cebf; }
 .event .meeting-with-guest { flex-direction:column; gap:12px; }
 .event .event-details-copy { width:100%; }
-.event .featured-guest { width:100%; flex:none; grid-template-columns:112px minmax(0,1fr); align-items:center; }
-.event .featured-guest-badge { grid-column:1/-1; }
-.event .featured-guest-copy { grid-column:2; }
-.event .featured-guest:not(.has-logo) .featured-guest-copy { grid-column:1/-1; }
-@media(max-width:440px) { .event .featured-guest { grid-template-columns:92px minmax(0,1fr); } }
 
 /* Home information hierarchy: updates → work → participation → progress.
    Hero, member card and the event-first responsive rules stay unchanged. */
@@ -1470,10 +1442,6 @@ html { scrollbar-width:thin; scrollbar-color:#71603b #0b0b0b; }
 .home .home-meetup-date > span, .home .home-meetup-meta svg { color:#d9bc7a; }
 .home .meetup-arrows button { background:#181818; border-color:#51462f; color:#e4cd98; }
 .home .meetup-arrows button:hover:not(:disabled) { background:#2d271c; border-color:#bc9b51; }
-.home .featured-guest { background:#1b1a18; border-color:#4c4434; }
-.home .featured-guest-badge { color:#e1c486; }
-.home .featured-guest-copy b { color:#e8e0d1; }
-.home .featured-guest-description { color:#c7c0b4; border-top-color:#403b31; }
 .home .event-prereg .btn-gold { background:#d7b766; color:#15120c; animation:none; box-shadow:none; border-color:#d7b766; }
 .home .event-prereg .btn-gold:hover:not(:disabled) { background:#ebcd87; color:#15120c; border-color:#ebcd87; box-shadow:none; }
 .home .event-prereg .btn-ghost { background:#1b1b1b; border-color:#6a5935; }
@@ -1491,3 +1459,42 @@ html { scrollbar-width:thin; scrollbar-color:#71603b #0b0b0b; }
 .home-description-toggle { display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:4px 0; border:0; background:none; color:#e1c486; font:500 14px/1.4 var(--sans); }
 .home-description-toggle:hover { color:#f3dda7; }
 .home-description-toggle:focus-visible { outline:2px solid #edcf8c; outline-offset:3px; }
+
+/* Guest identity and organizations are intentionally separate.
+   Shared by the Home carousel and Events; no logo is used as a portrait. */
+.featured-guest {
+  width:288px; max-width:100%; min-width:0; flex:0 0 288px;
+  display:flex; flex-direction:column; gap:16px; padding:18px;
+  border:1px solid #4c4434; border-radius:12px; background:#1b1a18;
+}
+.home-meetup .featured-guest, .event .featured-guest {
+  width:100%; flex:none; margin-top:14px;
+}
+.featured-guest-badge { color:#e1c486; font-size:14px; font-weight:500; line-height:1.4; }
+.guest-identity { display:flex; align-items:center; gap:14px; min-width:0; }
+.guest-portrait { width:64px; height:64px; flex:0 0 64px; border-radius:50%; object-fit:cover; border:1px solid var(--line2); }
+.featured-guest-copy { display:grid; gap:4px; min-width:0; overflow-wrap:anywhere; }
+.featured-guest-copy strong { font:500 26px/1.15 var(--serif); color:var(--ivory); }
+.featured-guest-copy span { color:var(--mute); font-size:14px; line-height:1.5; }
+.featured-guest-copy b { color:#e8e0d1; font-size:14px; line-height:1.5; font-weight:500; }
+.guest-brand-list { display:flex; flex-wrap:wrap; align-items:flex-start; gap:12px; list-style:none; padding:0; margin:0; min-width:0; }
+.guest-brand { display:flex; flex-direction:column; align-items:center; gap:7px; width:104px; max-width:100%; min-width:0; }
+.guest-brand.is-wide { width:164px; }
+.guest-brand-art { width:100%; height:80px; padding:12px; display:flex; align-items:center; justify-content:center; border-radius:8px; border:1px solid var(--hair); }
+.guest-brand-art.on-light { background:#fff; }
+.guest-brand-art.on-dark { background:#101110; }
+.guest-brand-art.on-transparent { background:transparent; }
+.guest-brand-art img { display:block; width:100%; height:100%; object-fit:contain; }
+.guest-brand-name { color:#d1cabc; font-size:14px; line-height:1.4; text-align:center; overflow-wrap:anywhere; max-width:100%; }
+.featured-guest-description { margin:0; padding-top:14px; border-top:1px solid #403b31; color:#c7c0b4; font-size:14px; line-height:1.65; white-space:pre-line; overflow-wrap:anywhere; }
+@media(max-width:800px) { .featured-guest { width:100%; flex-basis:auto; } }
+@media(max-width:440px) {
+  .featured-guest { padding:16px; gap:14px; }
+  .featured-guest-copy strong { font-size:25px; }
+  .guest-brand-list { gap:10px; }
+  .guest-brand { width:96px; }
+  .guest-brand.is-wide { width:144px; }
+  .guest-brand-art { height:76px; padding:10px; }
+}
+@media(max-width:800px) { .meeting-with-guest { flex-direction:column; gap:16px; } }
+@media(min-width:1100px) { .home-meetups-list > :not(:first-child) .meeting-with-guest { flex-direction:column; } }

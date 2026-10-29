@@ -247,7 +247,8 @@ export const setEventPreregistration = (kind: MemberEvent['kind'], id: string, p
   rpc<void>('member_set_event_preregistration', { p_kind: kind, p_id: id, p_planning: planning })
 
 // Explicitly published guest affiliation, independent of Headliner/stickers.
-export interface EventGuest { id: string; kind: MemberEvent['kind']; guest_name: string | null; guest_role: string | null; guest_company: string | null; guest_description: string | null; guest_logo_path: string | null }
+export interface GuestBrand { name: string; path: string; background?: 'light' | 'dark' | 'transparent'; shape?: 'square' | 'wide' }
+export interface EventGuest { id: string; kind: MemberEvent['kind']; guest_name: string | null; guest_role: string | null; guest_company: string | null; guest_description: string | null; guest_logo_path: string | null; guest_photo_path?: string | null; guest_logos?: GuestBrand[] | null }
 export const useEventGuests = () => useQuery({
   queryKey: ['event-guests'], staleTime: 30_000, refetchInterval: 30_000, refetchOnWindowFocus: true,
   queryFn: () => rpc<EventGuest[]>('member_event_guests'),
@@ -255,6 +256,9 @@ export const useEventGuests = () => useQuery({
 export const useGuestLogo = (path: string | null | undefined) => useQuery({
   queryKey: ['guest-logo', path], enabled: !!path, staleTime: 30 * 60_000,
   queryFn: async () => {
+    // Local public assets and HTTPS URLs do not require a private storage signature.
+    if (path!.startsWith('/') && !path!.startsWith('//')) return path!
+    if (/^https:\/\//i.test(path!)) return path!
     const { data, error } = await supabase.storage.from('guest-logos').createSignedUrl(path!, 3600)
     if (error) throw error
     return data.signedUrl
