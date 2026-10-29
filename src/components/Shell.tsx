@@ -22,10 +22,15 @@ export const MORE = [
   { to: '/propose', label: 'Propose an Event', icon: 'bulb' },
   { to: '/leadership', label: 'Leadership Opportunities', icon: 'people' },
   { to: '/record', label: 'My Record', icon: 'record' },
-  { to: '/resume', label: 'Résumé Builder', icon: 'resume' },
+
   { to: '/install', label: 'Get the App', icon: 'phone' },
   { to: '/people/me', label: 'My Page', icon: 'edit' },
   { to: '/profile', label: 'My Profile', icon: 'user' },
+]
+
+export const MY_USJ = [
+  { to: '/my-usj', label: 'My USJ Planner', icon: 'calendar' },
+  { to: '/resume', label: 'Résumé Builder', icon: 'resume' },
 ]
 
 /** Tells the directory you are online (about once a minute while the portal is open). */
@@ -50,7 +55,7 @@ export function Shell() {
   const name = me?.member?.full_name ?? me?.board?.full_name ?? ''
   const r = rankOf(me?.total ?? 0)
   const groupme = me?.settings?.groupme_url
-  const moreActive = MORE.some((m) => loc.pathname.startsWith(m.to))
+  const moreActive = [...MORE, ...MY_USJ].some((m) => loc.pathname.startsWith(m.to))
   const isWatch = loc.pathname.startsWith('/watch')
 
   return (
@@ -61,6 +66,8 @@ export function Shell() {
           {MAIN.map((n) => <NavLink key={n.to} to={n.to} end={n.end} data-tour={n.to}><Icon name={n.icon} />{n.label}{n.to === '/watch' && live?.live && <b className="live-dot" title="Live now" />}</NavLink>)}
           <p className="side-sec">Society</p>
           {MORE.slice(0, 6).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          <p className="side-sec">My USJ</p>
+          {MY_USJ.map(n => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           <p className="side-sec">You</p>
           {MORE.slice(6).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           {groupme && <a href={groupme} target="_blank" rel="noopener noreferrer"><Icon name="chat" />GroupMe Chat<Icon name="ext" size={13} className="ext" /></a>}
@@ -92,6 +99,7 @@ export function Shell() {
           <div className="sheet" role="dialog" aria-label="More" onClick={(e) => e.stopPropagation()}>
             <span className="sheet-grip" />
             <div className="sheet-grid">
+              {MY_USJ.map(n => <NavLink key={n.to} to={n.to}><Icon name={n.icon} size={22} /><span>{n.label}</span></NavLink>)}
               {MORE.map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} size={22} /><span>{n.label}</span></NavLink>)}
               {groupme && <a href={groupme} target="_blank" rel="noopener noreferrer"><Icon name="chat" size={22} /><span>GroupMe Chat</span></a>}
               <a href="https://www.instagram.com/usjlps" target="_blank" rel="noopener noreferrer"><Icon name="insta" size={22} /><span>@usjlps</span></a>

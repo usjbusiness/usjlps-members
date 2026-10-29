@@ -31,6 +31,7 @@ import { Profile } from '@/pages/Profile'
 import { PollsPage } from '@/pages/Polls'
 import { NotesPage } from '@/pages/Notes'
 import { RecordPage } from '@/pages/Record'
+import { MyUSJ } from '@/pages/MyUSJ'
 import { ResumePage } from '@/pages/Resume'
 import { PublicPage } from '@/pages/Public'
 import { CertificatePage } from '@/pages/Certificate'
@@ -77,6 +78,7 @@ createRoot(document.getElementById('root')!).render(
                       <Route path="notes" element={<NotesPage />} />
                       <Route path="record" element={<RecordPage />} />
                       <Route path="resume" element={<ResumePage />} />
+                    <Route path="my-usj" element={<MyUSJ />} />
                       <Route path="people" element={<People />} />
                       <Route path="people/:key" element={<PersonPage />} />
                       <Route path="rank" element={<RankPage />} />
