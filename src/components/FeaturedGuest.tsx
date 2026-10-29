@@ -2,19 +2,14 @@ import { useState } from 'react'
 import { useEventGuests, useGuestLogo, type MemberEvent, type EventGuest, type GuestBrand } from '@/lib/api'
 import { resolveGuestMedia } from '@/lib/guestMedia'
 
-function BrandLogo({ brand }: { brand: GuestBrand }) {
+function BrandWatermark({ brand }: { brand: GuestBrand }) {
   const logo = useGuestLogo(brand.path)
   const [failedUrl, setFailedUrl] = useState<string>()
-  const [isWide, setIsWide] = useState(brand.shape === 'wide')
-  const show = !!logo.data && logo.data !== failedUrl
-  return <li className={`guest-brand${isWide ? ' is-wide' : ''}`}>
-    {show && <div className={`guest-brand-art on-${brand.background || 'light'}`}>
-      <img src={logo.data} alt={`${brand.name} logo`} loading="lazy" decoding="async"
-        onLoad={e => setIsWide(brand.shape ? brand.shape === 'wide' : e.currentTarget.naturalWidth / e.currentTarget.naturalHeight > 1.8)}
-        onError={() => setFailedUrl(logo.data)} />
-    </div>}
-    <span className="guest-brand-name">{brand.name}</span>
-  </li>
+  if (!logo.data || logo.data === failedUrl) return null
+  return <span className={`guest-watermark on-${brand.background || 'light'}`}>
+    <img src={logo.data} alt="" loading="lazy" decoding="async"
+      onError={() => setFailedUrl(logo.data)} />
+  </span>
 }
 
 function GuestPortrait({ path, name }: { path: string; name: string }) {
@@ -29,18 +24,18 @@ export function GuestCard({ guest }: { guest: EventGuest }) {
   const media = resolveGuestMedia(guest)
   const brands = media.logos?.filter(brand => brand.path?.trim() && brand.name?.trim()) ?? []
   return <aside className="featured-guest" aria-label="Guest speaker">
+    {brands.length > 0 && <div className={`guest-watermarks${brands.length > 1 ? ' is-multiple' : ''}`} aria-hidden="true">
+      {brands.slice(0, 2).map((brand, index) => <BrandWatermark key={`${brand.path}:${index}`} brand={brand} />)}
+    </div>}
     <span className="featured-guest-badge">Guest speaker</span>
     <div className="guest-identity">
       {media.photo && <GuestPortrait path={media.photo} name={guest.guest_name || 'Guest speaker'} />}
       <div className="featured-guest-copy">
         {guest.guest_name && <strong>{guest.guest_name}</strong>}
         {guest.guest_role && <span>{guest.guest_role}</span>}
-        {guest.guest_company && <b>{guest.guest_company}</b>}
+        {(guest.guest_company || brands.length > 0) && <b>{guest.guest_company || brands.map(brand => brand.name).join(' · ')}</b>}
       </div>
     </div>
-    {brands.length > 0 && <ul className="guest-brand-list" aria-label="Guest organizations">
-      {brands.map((brand, index) => <BrandLogo key={`${brand.path}:${index}`} brand={brand} />)}
-    </ul>}
     {guest.guest_description && <p className="featured-guest-description">{guest.guest_description}</p>}
   </aside>
 }
