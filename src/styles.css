@@ -1460,42 +1460,47 @@ html { scrollbar-width:thin; scrollbar-color:#71603b #0b0b0b; }
 .home-description-toggle:hover { color:#f3dda7; }
 .home-description-toggle:focus-visible { outline:2px solid #edcf8c; outline-offset:3px; }
 
-/* Compact guest card: brand marks are decorative background art, not a row.
-   White image backgrounds are neutralized with inversion + screen blending.
-   Text remains above the artwork; no title width or vertical space is reserved. */
+/* Editorial guest card. Original-color brand cover above the identity;
+   no watermark behind text, no duplicate organization captions. */
 .featured-guest {
-  position:relative; isolation:isolate; overflow:hidden;
+  --guest-pad:18px;
+  position:relative; overflow:hidden;
   width:288px; max-width:100%; min-width:0; flex:0 0 288px;
-  display:flex; flex-direction:column; gap:12px; padding:18px;
+  display:flex; flex-direction:column; gap:12px; padding:var(--guest-pad);
   border:1px solid #4c4434; border-radius:12px; background:#1b1a18;
 }
 .home-meetup .featured-guest, .event .featured-guest { width:100%; flex:none; margin-top:14px; }
-.featured-guest-badge, .guest-identity, .featured-guest-description { position:relative; z-index:1; }
-.featured-guest-badge { color:#e1c486; font-size:14px; font-weight:500; line-height:1.4; }
+.guest-cover {
+  display:flex; align-items:stretch; flex:none;
+  height:104px; width:calc(100% + var(--guest-pad) * 2);
+  margin:calc(-1 * var(--guest-pad)) calc(-1 * var(--guest-pad)) 4px;
+  border-bottom:2px solid #b89c5d; background:#f4f1e9;
+}
+.guest-cover:empty { display:none; }
+.guest-cover-brand {
+  position:relative; display:flex; align-items:center; justify-content:center;
+  flex:1; min-width:0; padding:18px 28px; background:#f4f1e9;
+}
+.guest-cover-brand + .guest-cover-brand { border-left:1px solid rgba(201,165,76,.3); }
+.guest-cover-brand.on-dark { background:#111310; }
+.guest-cover-brand.on-transparent { background:#1b1a18; }
+.guest-cover-brand img { display:block; width:100%; max-width:240px; height:100%; object-fit:contain; }
+.guest-cover.is-multiple .guest-cover-brand { padding:16px 22px; }
+.guest-cover.is-multiple .guest-cover-brand img { max-width:170px; }
+.featured-guest-badge { color:#e1c486; font-size:13px; font-weight:600; letter-spacing:.06em; line-height:1.4; }
 .guest-identity { display:flex; align-items:center; gap:14px; min-width:0; }
 .guest-portrait { width:64px; height:64px; flex:0 0 64px; border-radius:50%; object-fit:cover; border:1px solid var(--line2); }
 .featured-guest-copy { display:grid; gap:4px; min-width:0; overflow-wrap:anywhere; }
-.featured-guest-copy strong { font:500 26px/1.15 var(--serif); color:var(--ivory); }
+.featured-guest-copy strong { font:500 27px/1.15 var(--serif); color:var(--ivory); }
 .featured-guest-copy span { color:var(--mute); font-size:14px; line-height:1.5; }
 .featured-guest-copy b { color:#e8e0d1; font-size:14px; line-height:1.5; font-weight:500; }
-.guest-watermarks {
-  position:absolute; z-index:0; pointer-events:none; user-select:none;
-  top:8px; right:6px; width:55%; max-width:210px; height:132px;
-  display:flex; align-items:flex-start; justify-content:flex-end; gap:10px;
-  opacity:.11; mix-blend-mode:screen;
-  mask-image:linear-gradient(to bottom,#000 0%,#000 65%,transparent 100%);
-  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 65%,transparent 100%);
-}
-.guest-watermark { display:flex; align-items:center; justify-content:center; flex:1; min-width:0; height:110px; }
-.guest-watermark img { width:100%; height:100%; object-fit:contain; filter:grayscale(1) invert(1); }
-.guest-watermark.on-dark img, .guest-watermark.on-transparent img { filter:grayscale(1) brightness(1.15); }
-.guest-watermarks.is-multiple { max-width:220px; gap:14px; }
 .featured-guest-description { margin:0; padding-top:12px; border-top:1px solid #403b31; color:#c7c0b4; font-size:14px; line-height:1.65; white-space:pre-line; overflow-wrap:anywhere; }
 @media(max-width:800px) { .featured-guest { width:100%; flex-basis:auto; } .meeting-with-guest { flex-direction:column; gap:16px; } }
 @media(max-width:440px) {
-  .featured-guest { padding:16px; gap:12px; }
+  .featured-guest { --guest-pad:16px; gap:12px; }
   .featured-guest-copy strong { font-size:25px; }
-  .guest-watermarks { width:52%; max-width:160px; height:120px; top:8px; right:4px; opacity:.085; }
-  .guest-watermark { height:94px; }
+  .guest-cover { height:90px; }
+  .guest-cover-brand { padding:16px 24px; }
+  .guest-cover.is-multiple .guest-cover-brand { padding:14px 20px; }
 }
 @media(min-width:1100px) { .home-meetups-list > :not(:first-child) .meeting-with-guest { flex-direction:column; } }

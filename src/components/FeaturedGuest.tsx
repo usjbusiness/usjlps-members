@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { useEventGuests, useGuestLogo, type MemberEvent, type EventGuest, type GuestBrand } from '@/lib/api'
 import { resolveGuestMedia } from '@/lib/guestMedia'
 
-function BrandWatermark({ brand }: { brand: GuestBrand }) {
+function BrandCover({ brand }: { brand: GuestBrand }) {
   const logo = useGuestLogo(brand.path)
   const [failedUrl, setFailedUrl] = useState<string>()
   if (!logo.data || logo.data === failedUrl) return null
-  return <span className={`guest-watermark on-${brand.background || 'light'}`}>
-    <img src={logo.data} alt="" loading="lazy" decoding="async"
+  return <span className={`guest-cover-brand on-${brand.background || 'light'}`}>
+    <img src={logo.data} alt={`${brand.name} logo`} loading="lazy" decoding="async"
       onError={() => setFailedUrl(logo.data)} />
   </span>
 }
@@ -24,8 +24,8 @@ export function GuestCard({ guest }: { guest: EventGuest }) {
   const media = resolveGuestMedia(guest)
   const brands = media.logos?.filter(brand => brand.path?.trim() && brand.name?.trim()) ?? []
   return <aside className="featured-guest" aria-label="Guest speaker">
-    {brands.length > 0 && <div className={`guest-watermarks${brands.length > 1 ? ' is-multiple' : ''}`} aria-hidden="true">
-      {brands.slice(0, 2).map((brand, index) => <BrandWatermark key={`${brand.path}:${index}`} brand={brand} />)}
+    {brands.length > 0 && <div className={`guest-cover${brands.length > 1 ? ' is-multiple' : ''}`} aria-label="Guest organizations">
+      {brands.slice(0, 2).map((brand, index) => <BrandCover key={`${brand.path}:${index}`} brand={brand} />)}
     </div>}
     <span className="featured-guest-badge">Guest speaker</span>
     <div className="guest-identity">
