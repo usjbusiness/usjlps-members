@@ -12,7 +12,7 @@ export function PrintPlannerDialog({plans,activeId,onClose}:{plans:Plan[];active
  const [selected,setSelected]=useState([activeId]),[student,setStudent]=useState(''),[note,setNote]=useState(''),[labels,setLabels]=useState<Record<string,string>>({}),[readyHTML,setReadyHTML]=useState(''),[error,setError]=useState('')
  const [layout,setLayout]=useState<'portrait'|'landscape'>('portrait')
  const chosen=plans.filter(p=>selected.includes(p.id))
- const html=useMemo(()=>plannerPrintDocument(plans.filter(p=>selected.includes(p.id)),{activeId,student,note,labels},printStyles.replace('size:portrait',`size:${layout}`)),[plans,selected,activeId,student,note,labels,layout])
+ const html=useMemo(()=>plannerPrintDocument(plans.filter(p=>selected.includes(p.id)),{activeId,student,note,labels},printStyles.replace('size:portrait',`size:${layout}`).replaceAll('--pp-height:480px',`--pp-height:${layout==='landscape'?320:480}px`)),[plans,selected,activeId,student,note,labels,layout])
  useEffect(()=>{const previous=document.activeElement as HTMLElement|null;dialog.current?.showModal();return()=>previous?.focus()},[])
  const print=()=>{try{if(!frame.current?.contentWindow)throw new Error();frame.current.contentWindow.focus();frame.current.contentWindow.print();setError('')}catch{setError('The print dialog could not open. Try again in a standard browser tab.')}}
  return <dialog ref={dialog} className="planner-print-dialog" aria-labelledby="planner-print-title" onCancel={e=>{e.preventDefault();onClose()}}>
