@@ -1,0 +1,24 @@
+.email-image-editor { min-width: 0; }
+.email-image-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.email-image-toolbar .btn { min-height: 44px; }
+.email-image-toolbar > span, .email-image-help { font-size: 14px; color: var(--ink-2, #514f49); line-height: 1.6; }
+.email-image-help { margin: 10px 0 12px; overflow-wrap: anywhere; }
+.email-image-file { display: none; }
+.email-image-editor > textarea { width: 100%; box-sizing: border-box; resize: vertical; min-height: 180px; }
+.email-image-status { font-size: 14px; color: var(--ink-2); }
+.email-image-item { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; padding: 16px; margin-top: 16px; border: 1px solid var(--line); background: var(--paper, #fffdf8); border-radius: 8px; }
+.email-image-thumb { display: flex; align-items: center; justify-content: center; min-height: 100px; background: #fff; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.email-image-thumb img { max-width: 100%; max-height: 160px; object-fit: contain; }
+.email-image-controls { display: grid; gap: 12px; min-width: 0; }
+.email-image-controls label { display: grid; gap: 6px; font-size: 14px; }
+.email-image-controls input, .email-image-controls select { width: 100%; min-width: 0; min-height: 44px; box-sizing: border-box; }
+.email-image-controls button { justify-self: start; min-height: 44px; }
+.email-image-editor :focus-visible { outline: 2px solid var(--gold-deep, #83641c); outline-offset: 3px; }
+.announcement-rich-body p { margin: 0 0 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.announcement-rich-body figure { margin: 18px 0; text-align: center; }
+.announcement-rich-body img { max-width: 100%; height: auto; }
+@media (max-width: 480px) {
+  .email-image-item { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
+  .email-image-thumb { max-height: 150px; }
+  .email-image-thumb img { max-height: 140px; }
+}

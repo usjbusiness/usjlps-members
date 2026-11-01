@@ -1,13 +1,19 @@
 {
-  "name": "lps-member-portal",
+  "name": "usj-eboard-portal",
   "private": true,
   "version": "1.0.0",
-  "description": "USJ Leadership & Professional Society — Member Portal (members.usjlps.org)",
+  "description": "USJ Business Society \u2014 Executive Board Portal (internal management system)",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit -p . && vite build",
-    "preview": "vite preview"
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit",
+    "test:db": "node supabase/tests/policies.test.mjs",
+    "test:attendance": "node supabase/tests/attendance-access.test.mjs",
+    "test:templates": "node supabase/tests/guest-templates.test.mjs",
+    "test:email-api": "node supabase/tests/email-api.test.cjs",
+    "test:email-images": "node supabase/tests/email-images.test.cjs && node supabase/tests/email-images-storage.test.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -17,14 +23,15 @@
     "@fontsource/inter": "^5.3.0",
     "@supabase/supabase-js": "^2.117.2",
     "@tanstack/react-query": "^5.104.1",
-    "docx": "^9.10.0",
-    "jspdf": "^4.2.1",
-    "qrcode-generator": "^1.5.2",
+    "date-fns": "^4.4.0",
+    "docx": "^9.14.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "write-excel-file": "^4.1.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
