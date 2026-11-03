@@ -14,6 +14,7 @@ export const MAIN = [
 ]
 export const MORE = [
   { to: '/events', label: 'Events', icon: 'calendar' },
+  { to: '/guest-library', label: 'Guests & Recordings', icon: 'live' },
   { to: '/polls', label: 'Polls', icon: 'poll' },
   { to: '/notes', label: 'My Notes', icon: 'note' },
   { to: '/rank', label: 'Rank & Stickers', icon: 'medal' },
@@ -65,11 +66,11 @@ export function Shell() {
         <nav className="side-nav">
           {MAIN.map((n) => <NavLink key={n.to} to={n.to} end={n.end} data-tour={n.to}><Icon name={n.icon} />{n.label}{n.to === '/watch' && live?.live && <b className="live-dot" title="Live now" />}</NavLink>)}
           <p className="side-sec">Society</p>
-          {MORE.slice(0, 6).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          {MORE.slice(0, 7).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           <p className="side-sec">My USJ</p>
           {MY_USJ.map(n => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           <p className="side-sec">You</p>
-          {MORE.slice(6).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          {MORE.slice(7).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           {groupme && <a href={groupme} target="_blank" rel="noopener noreferrer"><Icon name="chat" />GroupMe Chat<Icon name="ext" size={13} className="ext" /></a>}
           <button type="button" className="side-tour" onClick={startTour}><Icon name="sparkle" />Portal tour</button>
         </nav>

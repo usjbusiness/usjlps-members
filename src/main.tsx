@@ -20,6 +20,7 @@ import { Home } from '@/pages/Home'
 import { News } from '@/pages/News'
 import { Events } from '@/pages/Events'
 import { Watch } from '@/pages/Watch'
+import { GuestsLibrary } from '@/pages/GuestsLibrary'
 import { People } from '@/pages/People'
 import { PersonPage } from '@/pages/Person'
 import { RankPage } from '@/pages/Rank'
@@ -73,6 +74,7 @@ createRoot(document.getElementById('root')!).render(
                     <Route element={<Shell />}>
                       <Route index element={<Home />} />
                       <Route path="watch" element={<Watch />} />
+                      <Route path="guest-library" element={<GuestsLibrary />} />
                       <Route path="news" element={<News />} />
                       <Route path="events" element={<Events />} />
                       <Route path="notes" element={<NotesPage />} />
