@@ -73,6 +73,7 @@ export function HomeEvents({ events }: { events: MemberEvent[] }) {
       {events.map((e, i) => {
         const canPlan = ['tentative', 'scheduled', 'confirmed', 'upcoming'].includes(e.status) && new Date(e.starts_at).getTime() > Date.now()
         return <article key={`${e.kind}-${e.id}`} className="home-meetup" aria-label={e.title} aria-roledescription="slide" aria-description={`${i + 1} of ${events.length}`}>
+          <FeaturedGuest event={e} coverOnly />
           <div className="home-meetup-top">
             <div className="home-meetup-date" aria-label={fmtDate(e.starts_at, { month: 'long', day: 'numeric', weekday: 'long' })}>
               <span>{fmtDate(e.starts_at, { month: 'short' })}</span><b>{fmtDate(e.starts_at, { day: 'numeric' })}</b><small>{fmtDate(e.starts_at, { weekday: 'short' })}</small>
@@ -84,7 +85,7 @@ export function HomeEvents({ events }: { events: MemberEvent[] }) {
             </div>
           </div>
           {e.description?.trim() && <MeetingDescription text={e.description.trim()} title={e.title} />}
-          <FeaturedGuest event={e} />
+          <FeaturedGuest event={e} hideCover />
           <EventPreregistration event={e} home />
           <div className="home-meetup-links">
             {canPlan && <button type="button" className="btn btn-ghost btn-sm" onClick={() => addToCalendar(e)}><Icon name="calendar" size={14} />Calendar</button>}

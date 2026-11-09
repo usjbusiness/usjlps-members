@@ -10,18 +10,15 @@ export const MAIN = [
   { to: '/', label: 'Home', icon: 'home', end: true },
   { to: '/watch', label: 'Live & Library', short: 'Live', icon: 'live' },
   { to: '/news', label: 'Announcements', short: 'News', icon: 'news' },
-  { to: '/people', label: 'Members', short: 'People', icon: 'people' },
+  { to: '/people', label: 'Members & Applications', short: 'People', icon: 'people' },
 ]
 export const MORE = [
   { to: '/events', label: 'Events', icon: 'calendar' },
   { to: '/guest-library', label: 'Guests & Recordings', icon: 'live' },
   { to: '/polls', label: 'Polls', icon: 'poll' },
   { to: '/notes', label: 'My Notes', icon: 'note' },
-  { to: '/rank', label: 'Rank & Stickers', icon: 'medal' },
-  { to: '/certificate', label: 'LPS Certificate', icon: 'cert' },
-  { to: '/apparel', label: 'LPS Merch', icon: 'shirt' },
+  { to: '/rewards', label: 'Rewards', icon: 'medal' },
   { to: '/propose', label: 'Propose an Event', icon: 'bulb' },
-  { to: '/leadership', label: 'Leadership Opportunities', icon: 'people' },
   { to: '/record', label: 'My Record', icon: 'record' },
 
   { to: '/install', label: 'Get the App', icon: 'phone' },
@@ -52,6 +49,8 @@ export function Shell() {
   const live = useLiveNow().data
   const loc = useLocation()
   const [sheet, setSheet] = useState(false)
+  const [theme, setTheme] = useState(() => localStorage.getItem('lps-theme') === 'light' ? 'light' : 'dark')
+  useEffect(() => { document.documentElement.dataset.theme = theme; localStorage.setItem('lps-theme', theme) }, [theme])
   useEffect(() => { setSheet(false); window.scrollTo(0, 0) }, [loc.pathname])
   const name = me?.member?.full_name ?? me?.board?.full_name ?? ''
   const r = rankOf(me?.total ?? 0)
@@ -66,12 +65,13 @@ export function Shell() {
         <nav className="side-nav">
           {MAIN.map((n) => <NavLink key={n.to} to={n.to} end={n.end} data-tour={n.to}><Icon name={n.icon} />{n.label}{n.to === '/watch' && live?.live && <b className="live-dot" title="Live now" />}</NavLink>)}
           <p className="side-sec">Society</p>
-          {MORE.slice(0, 7).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          {MORE.filter(n => ['/events', '/guest-library', '/polls', '/notes', '/rewards'].includes(n.to)).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           <p className="side-sec">My USJ</p>
           {MY_USJ.map(n => <NavLink key={n.to} to={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           <p className="side-sec">You</p>
-          {MORE.slice(7).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
+          {MORE.filter(n => !['/events', '/guest-library', '/polls', '/notes', '/rewards'].includes(n.to)).map((n) => <NavLink key={n.to} to={n.to} data-tour={n.to}><Icon name={n.icon} />{n.label}</NavLink>)}
           {groupme && <a href={groupme} target="_blank" rel="noopener noreferrer"><Icon name="chat" />GroupMe Chat<Icon name="ext" size={13} className="ext" /></a>}
+          <button type="button" className="side-tour theme-switch" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? '☀ Light mode' : '☾ Dark mode'}</button>
           <button type="button" className="side-tour" onClick={startTour}><Icon name="sparkle" />Portal tour</button>
         </nav>
         <Link to="/profile" className="side-me">
@@ -82,6 +82,7 @@ export function Shell() {
 
       <header className="top">
         <Link to="/" className="top-brand"><img src="/img/mono-gold.webp" alt="" /><span>USJ <b>LPS</b></span></Link>
+        <button type="button" className="theme-mobile" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? 'Light' : 'Dark'}</button>
         {live?.live && <Link to="/watch" className="top-live"><b className="live-dot" />Live now</Link>}
         <Link to="/profile" className="top-me" aria-label="My profile"><Avatar name={name} path={me?.board?.avatar_url} size={34} /></Link>
       </header>

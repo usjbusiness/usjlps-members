@@ -81,9 +81,10 @@ createRoot(document.getElementById('root')!).render(
                       <Route path="record" element={<RecordPage />} />
                       <Route path="resume" element={<ResumePage />} />
                     <Route path="my-usj" element={<MyUSJ />} />
-                      <Route path="people" element={<People />} />
+                      <Route path="people" element={<><People /><LeadershipPage /></>} />
                       <Route path="people/:key" element={<PersonPage />} />
                       <Route path="rank" element={<RankPage />} />
+                      <Route path="rewards" element={<><RankPage /><CertificatePage /><ApparelPage /></>} />
                       <Route path="certificate" element={<CertificatePage />} />
                       <Route path="apparel" element={<ApparelPage />} />
                       <Route path="propose" element={<Propose />} />

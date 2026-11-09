@@ -1504,3 +1504,30 @@ html { scrollbar-width:thin; scrollbar-color:#71603b #0b0b0b; }
   .guest-cover.is-multiple .guest-cover-brand { padding:14px 20px; }
 }
 @media(min-width:1100px) { .home-meetups-list > :not(:first-child) .meeting-with-guest { flex-direction:column; } }
+
+/* User-selected light theme. The member ID remains dark intentionally. */
+html[data-theme="light"] { --ink:#f4f3ed; --ink2:#fffefa; --ink3:#ebece5; --card:#fffefa; --card2:#f1f3eb; --text:#1b3029; --ivory:#1b3029; --mute:#52635a; --dim:#65736a; --gold:#8b6b28; --gold2:#6b511c; --gold3:#86651c; --line:#d9ddcf; --line2:#c7cebd; --hair:#e1e4dc; --green:#287046; --amber:#77551b; --red:#9c302b; color-scheme:light; }
+html[data-theme="light"] .side,html[data-theme="light"] .tabs,html[data-theme="light"] .top,html[data-theme="light"] .sheet { --ivory:#f5f1e7; --text:#f5f1e7; --mute:#d3ded3; --dim:#b0bfb2; --gold:#dfbd6e; --gold2:#e6c987; --line:#556858; --line2:#66765f; --hair:#ffffff26; --card:#ffffff0d; --card2:#ffffff10; background:#15362b; }
+html[data-theme="light"] .main { color:var(--text); }
+html[data-theme="light"] .panel,html[data-theme="light"] .home .home-meetup,html[data-theme="light"] .featured-guest,html[data-theme="light"] .home .hero,html[data-theme="light"] .qa,html[data-theme="light"] .home-announcement { background:#fffefa; border-color:#d6dccf; color:#1b3029; }
+html[data-theme="light"] .home .home-meetup-date { background:#f7f5ec; border-color:#d8d0b9; }
+html[data-theme="light"] .home .home-meetup-date > span,html[data-theme="light"] .home .home-meetup-meta svg { color:#72581e; }
+html[data-theme="light"] .home-meetup-description,html[data-theme="light"] .featured-guest-description { color:#52635a; border-color:#d6dccf; }
+html[data-theme="light"] .featured-guest-copy strong,html[data-theme="light"] .featured-guest-copy b { color:#1b3029; }
+html[data-theme="light"] .featured-guest-badge,html[data-theme="light"] .home-description-toggle { color:#765819; }
+html[data-theme="light"] .fld input,html[data-theme="light"] .fld textarea,html[data-theme="light"] .filters input,html[data-theme="light"] .filters select { background:#fffefa; color:#1b3029; border-color:#b9c5b8; }
+html[data-theme="light"] .btn-ghost { background:#fffefa; color:#264737; border-color:#aebdab; }
+html[data-theme="light"] .btn-ghost:hover:not(:disabled) { color:#18392d; background:#e6eee2; }
+html[data-theme="light"] .login,html[data-theme="light"] .login-card,html[data-theme="light"] .mcard { --ivory:#f3ede2; --text:#f3ede2; --mute:#d4d6ca; --dim:#b7bfb2; --gold:#c9a54c; --gold2:#e9d49a; --line:#b4994a55; --line2:#b4994a88; --hair:#ffffff20; color:#f3ede2; }
+html[data-theme="light"] .login .fld input { background:#ffffff10;color:#f3ede2;border-color:#ffffff40; }
+.theme-mobile { min-height:40px; padding:0 10px; color:#e9d49a; border:1px solid #b4994a88; background:transparent; border-radius:8px; }
+.theme-switch { min-height:44px; }
+.password-offer { margin-bottom:16px; } .password-offer .link { margin-left:16px; min-height:44px; }
+@media(max-width:560px) { .meetup-arrows { display:flex; flex-direction:row; } .home > .home-meetups { order:0; } }
+
+.home-meetup > .home-guest-cover { margin: -18px -18px 16px; width: auto; border-radius: 13px 13px 0 0; overflow: hidden; }
+@media(max-width:560px){ .home-meetup > .home-guest-cover { margin: -14px -14px 16px; } }
+/* Keep the membership card above upcoming events at all screen sizes. */
+.home > .home-meetups { order: 0; }
+.side-nav a > svg { width:18px; height:18px; flex:0 0 18px; }
+html[data-theme="dark"] .home-meetup-links .btn-ghost { background:#1b1b1b; color:#f4f1e9; border-color:#6a5935; }

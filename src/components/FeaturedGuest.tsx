@@ -20,11 +20,11 @@ function GuestPortrait({ path, name }: { path: string; name: string }) {
     onError={() => setFailedUrl(photo.data)} />
 }
 
-export function GuestCard({ guest }: { guest: EventGuest }) {
+export function GuestCard({ guest, hideCover = false }: { guest: EventGuest; hideCover?: boolean }) {
   const media = resolveGuestMedia(guest)
   const brands = media.logos?.filter(brand => brand.path?.trim() && brand.name?.trim()) ?? []
   return <aside className="featured-guest" aria-label="Guest speaker">
-    {brands.length > 0 && <div className={`guest-cover${brands.length > 1 ? ' is-multiple' : ''}`} aria-label="Guest organizations">
+    {!hideCover && brands.length > 0 && <div className={`guest-cover${brands.length > 1 ? ' is-multiple' : ''}`} aria-label="Guest organizations">
       {brands.slice(0, 2).map((brand, index) => <BrandCover key={`${brand.path}:${index}`} brand={brand} />)}
     </div>}
     <span className="featured-guest-badge">Guest speaker</span>
@@ -40,9 +40,13 @@ export function GuestCard({ guest }: { guest: EventGuest }) {
   </aside>
 }
 
-export function FeaturedGuest({ event }: { event: Pick<MemberEvent, 'kind' | 'id'> }) {
+export function FeaturedGuest({ event, coverOnly = false, hideCover = false }: { event: Pick<MemberEvent, 'kind' | 'id'>; coverOnly?: boolean; hideCover?: boolean }) {
   const q = useEventGuests()
   const guest = q.data?.find(g => g.id === event.id && g.kind === event.kind)
   if (!guest) return null // Optional enhancement must not block the event or RSVP.
-  return <GuestCard key={`${guest.kind}:${guest.id}`} guest={guest} />
+  if (coverOnly) {
+    const brands = (resolveGuestMedia(guest).logos ?? []).filter(brand => brand.path?.trim() && brand.name?.trim())
+    return brands.length ? <div className={`guest-cover home-guest-cover${brands.length > 1 ? ' is-multiple' : ''}`} aria-label="Guest organizations">{brands.slice(0, 2).map((brand, index) => <BrandCover key={`${brand.path}:${index}`} brand={brand} />)}</div> : null
+  }
+  return <GuestCard key={`${guest.kind}:${guest.id}`} guest={guest} hideCover={hideCover} />
 }
