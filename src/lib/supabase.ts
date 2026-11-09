@@ -11,7 +11,7 @@ export const SUPABASE_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | 
 const REMEMBER = 'lps-members-remember'
 export const remember = {
   get: () => { try { return localStorage.getItem(REMEMBER) !== '0' } catch { return true } },
-  set: (v: boolean) => { try { localStorage.setItem(REMEMBER, v ? '1' : '0') } catch { /* private mode */ } },
+  set: (v: boolean) => { try { const key = 'lps-members-auth'; const existing = localStorage.getItem(key) ?? sessionStorage.getItem(key); localStorage.setItem(REMEMBER, v ? '1' : '0'); if (existing) { if (v) { localStorage.setItem(key, existing); sessionStorage.removeItem(key) } else { sessionStorage.setItem(key, existing); localStorage.removeItem(key) } } } catch { /* storage may be unavailable */ } },
 }
 const storage = {
   getItem: (k: string) => { try { return localStorage.getItem(k) ?? sessionStorage.getItem(k) } catch { return null } },

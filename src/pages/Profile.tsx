@@ -7,6 +7,7 @@ import { fmtDate } from '@/lib/format'
 import { remember, supabase } from '@/lib/supabase'
 import { Avatar, Icon, Medal, PageHead, useToast } from '@/components/ui'
 import { MemberCard } from './Home'
+import { PasswordSecurity } from '@/components/PasswordSecurity'
 import { InterestsPicker } from '@/components/Polls'
 
 export function Profile() {
@@ -37,6 +38,7 @@ export function Profile() {
   return (
     <div className="page">
       <PageHead eyebrow="Account" title="My Profile" actions={<Link className="btn btn-gold" to="/people/me"><Icon name="user" size={16} />View my page</Link>} />
+      <PasswordSecurity />
       <div className="two">
         <section className="panel">
           <div className="prof-head"><Avatar name={name} path={me.board?.avatar_url} size={64} /><div><strong>{name}</strong><small>{m?.email ?? me.board?.email}</small></div></div>

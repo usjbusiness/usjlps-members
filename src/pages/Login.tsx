@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from '@/lib/auth'
-import { remember } from '@/lib/supabase'
+import { remember, supabase } from '@/lib/supabase'
 import { Net } from '@/components/Net'
 import { Icon } from '@/components/ui'
 
@@ -12,6 +12,9 @@ export function Login() {
   const [step, setStep] = useState<'email' | 'code'>('email')
   const [email, setEmail] = useState(() => localStorage.getItem('lps-members-email') ?? '')
   const [code, setCode] = useState('')
+  const [mode, setMode] = useState<'code' | 'password'>('password')
+  const [password, setPassword] = useState('')
+  const [sentReset, setSentReset] = useState(false)
   const [len, setLen] = useState(6)
   const [keep, setKeep] = useState(remember.get())
   const [busy, setBusy] = useState(false)
@@ -39,7 +42,23 @@ export function Login() {
     if (digits.length < 6) { setErr(`Enter the ${len}-digit code from the email.`); return }
     setBusy(true)
     remember.set(keep)
-    try { await verifyCode(email, digits) } catch (x) { setErr((x as Error).message); setBusy(false) }
+    try { sessionStorage.setItem('lps-offer-password', '1'); await verifyCode(email, digits) } catch (x) { sessionStorage.removeItem('lps-offer-password'); setErr((x as Error).message); setBusy(false) }
+  }
+  const passwordLogin = async (e: FormEvent) => {
+    e.preventDefault(); setErr(null); setNotice(null)
+    if (!EMAIL.test(email.trim()) || !password) { setErr('Enter your email and password.'); return }
+    setBusy(true); remember.set(keep)
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password })
+    if (error) { setErr('Email or password is incorrect. You can also use an email code.'); setBusy(false) }
+  }
+  const reset = async () => {
+    setErr(null)
+    if (!EMAIL.test(email.trim())) { setErr('Enter your email address first.'); return }
+    setBusy(true)
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo: `${location.origin}/reset-password` })
+    setBusy(false)
+    if (error) setErr('Could not send the reset email. Please try again later.')
+    else setSentReset(true)
   }
   const onCode = (v: string) => {
     const d = v.replace(/\D/g, '').slice(0, len); setCode(d)
@@ -56,17 +75,20 @@ export function Login() {
         <img className="login-mono" src="/img/mono-gold.webp" alt="USJ Leadership & Professional Society" />
         <p className="eyebrow">Member Portal</p>
         {step === 'email' ? (
-          <form onSubmit={send} noValidate>
+          <form onSubmit={mode === 'code' ? send : passwordLogin} noValidate>
             <h1>Welcome <em>back.</em></h1>
-            <p className="login-sub">Sign in with the USJ email you used to join. We will email you a one-time code, so there is no password to remember.</p>
+            <p className="login-sub">Sign in with your USJ email. Use a password or a one-time email code.</p>
             {notice && <p className="login-note" role="status">{notice}</p>}
             <label className="fld"><span>USJ email</span>
               <input type="email" inputMode="email" autoComplete="username email" autoCapitalize="none" spellCheck={false} placeholder="jdoe@usj.edu"
                 value={email} onChange={(e) => setEmail(e.target.value)} autoFocus={!email} />
             </label>
+            {mode === 'password' && <label className="fld"><span>Password</span><input type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} /></label>}
             <label className="check"><input type="checkbox" checked={keep} onChange={(e) => setKeep(e.target.checked)} /><span>Keep me signed in on this device</span></label>
             {err && <p className="form-err" role="alert">{err}</p>}
-            <button className="btn btn-gold btn-block btn-lg" disabled={busy}>{busy ? 'Sending your code…' : 'Email me a code'}<Icon name="arrow" size={18} /></button>
+            <button className="btn btn-gold btn-block btn-lg" disabled={busy}>{busy ? 'Please wait…' : mode === 'password' ? 'Sign in' : 'Email me a code'}<Icon name="arrow" size={18} /></button>
+            <div className="login-row"><button type="button" className="link" onClick={() => { setMode(mode === 'password' ? 'code' : 'password'); setErr(null); setSentReset(false) }}>{mode === 'password' ? 'Use an email code instead' : 'Use a password instead'}</button>{mode === 'password' && <button type="button" className="link" disabled={busy} onClick={() => void reset()}>Forgot password?</button>}</div>
+            {sentReset && <p className="login-note" role="status">If an account exists for this email, a reset link will be sent. Check your inbox.</p>}
           </form>
         ) : (
           <form onSubmit={verify} noValidate>

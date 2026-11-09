@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { HomeEvents } from '@/components/HomeEvents'
 import { Link } from 'react-router-dom'
 import { isOnline, rankOf, useDirectory, useEvents, useLiveNow, useMe, usePolls, usePosts, type Me } from '@/lib/api'
@@ -87,6 +88,7 @@ function HomeAnnouncements() {
 }
 
 export function Home() {
+  const [offerPassword, setOfferPassword] = useState(() => { try { return sessionStorage.getItem('lps-offer-password') === '1' } catch { return false } })
   const me = useMe().data!
   const events = useEvents().data ?? []
   const live = useLiveNow().data
@@ -118,6 +120,7 @@ export function Home() {
         </Link>
       )}
 
+      {offerPassword && <section className="panel password-offer"><strong>Want to sign in faster?</strong><p className="muted small">Set a password, or keep using an email code.</p><Link to="/profile" className="btn btn-ghost btn-sm">Set a password</Link><button className="link" onClick={() => { try { sessionStorage.removeItem('lps-offer-password') } catch {} setOfferPassword(false) }}>Not now</button></section>}
       <HomeEvents events={upcoming} />
 
       <div id="home-below-events" className="home-below-events">

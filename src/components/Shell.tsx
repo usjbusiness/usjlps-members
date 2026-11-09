@@ -27,6 +27,7 @@ export const MORE = [
 ]
 
 export const MY_USJ = [
+  { to: '/week', label: 'My Week', icon: 'calendar' },
   { to: '/my-usj', label: 'My USJ Planner', icon: 'calendar' },
   { to: '/resume', label: 'Résumé Builder', icon: 'resume' },
 ]

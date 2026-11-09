@@ -16,6 +16,8 @@ import { useMe } from '@/lib/api'
 import { ErrorBox, ToastProvider } from '@/components/ui'
 import { Shell } from '@/components/Shell'
 import { Login } from '@/pages/Login'
+import { ResetPassword } from '@/pages/ResetPassword'
+import { WeeklyPlanner } from '@/pages/WeeklyPlanner'
 import { Home } from '@/pages/Home'
 import { News } from '@/pages/News'
 import { Events } from '@/pages/Events'
@@ -65,6 +67,7 @@ createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <ToastProvider>
             <Routes>
+              <Route path="reset-password" element={<ResetPassword />} />
               <Route path="u/:slug" element={<PublicPage />} />
               <Route path="verify" element={<VerifyPage />} />
               <Route path="verify/:no" element={<VerifyPage />} />
@@ -80,6 +83,7 @@ createRoot(document.getElementById('root')!).render(
                       <Route path="notes" element={<NotesPage />} />
                       <Route path="record" element={<RecordPage />} />
                       <Route path="resume" element={<ResumePage />} />
+                    <Route path="week" element={<WeeklyPlanner />} />
                     <Route path="my-usj" element={<MyUSJ />} />
                       <Route path="people" element={<><People /><LeadershipPage /></>} />
                       <Route path="people/:key" element={<PersonPage />} />
